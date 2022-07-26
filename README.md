@@ -1,2 +1,2 @@
 # mc-server-management
-<h1><b>Currently not functional</b></h1>
+<h1><b>WIP</b></h1>

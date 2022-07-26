@@ -1,4 +1,7 @@
 const fs = require('fs');
+const os = require('os');
+
+const system_memory = os.totalmem() / 1024 / 1024;
 
 var active_server_id = 0;
 var temp_settings_data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
@@ -59,11 +62,16 @@ function listFiles() {
     server_list.forEach(element => {
         var server_properties = fs.readFileSync(element + '/server.properties', 'utf8');
         var server_images;
+        var server_args;
         data_temp = {};
 
-        //check if server_images.json exists
-        if (fs.existsSync(element + '/server_images.json')) {
-            server_images = JSON.parse(fs.readFileSync(element + '/server_images.json', 'utf8'));
+        //check if server.json exists
+        if (fs.existsSync(element + '/server.json')) {
+            server_data = JSON.parse(fs.readFileSync(element + '/server.json', 'utf8'));
+            server_images = server_data.images;
+            server_args = server_data.args;
+        } else {
+            fs.writeFileSync(element + '/server.json', JSON.stringify({'args':{},'images':[]}, null, 4));
         }
 
 
@@ -89,7 +97,7 @@ function listFiles() {
                 data_temp[property[0]] = property[1];
             }
         });
-        let j = { 'id': count, 'name': element.split('\\').pop(), 'path': element, 'images': server_images, 'properties': data_temp };
+        let j = { 'id': count, 'name': element.split('\\').pop(), 'path': element, 'args': server_args, 'images': server_images,'properties': data_temp };
         data[count.toString()] = j;
         count++;
     });
@@ -136,6 +144,8 @@ function loadServer(server_id) {
     *load server details into main page
     **/
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+    var startup_data = JSON.parse(fs.readFileSync(data[server_id].path + '/server.json', 'utf8'));
+
     data = data[server_id];
     active_server_id = server_id;
 
@@ -166,6 +176,57 @@ function loadServer(server_id) {
             image_container.appendChild(img);
         });
     }
+
+    //startup properties
+
+    var Xmx_slider = document.getElementById('Xmx_slider');
+    var Xmx_value = document.getElementById('Xmx_value');
+    var Xms_slider = document.getElementById('Xms_slider');
+    var Xms_value = document.getElementById('Xms_value');
+
+    var server_jar = document.getElementById('server_jar');
+
+    Xmx_slider.max = system_memory;
+    Xms_slider.max = system_memory;
+
+    if (startup_data.args.jar != undefined) {
+        Xmx_slider.value = startup_data.args.Xmx;
+        Xmx_value.value = startup_data.args.Xmx;
+
+        Xms_value.value = startup_data.args.Xms;
+        Xms_value.value = startup_data.args.Xms;
+
+        server_jar.value = startup_data.args.jar;
+    } else {
+        Xmx_slider.value = 0;
+        Xmx_value.value = 0;
+
+        Xms_value.value = 0;
+        Xms_value.value = 0;
+
+        server_jar.value = "Server jar filename";
+    }
+
+
+
+    Xmx_slider.oninput = function () {
+        Xmx_value.value = this.value;
+    }
+
+    Xmx_value.oninput = function () {
+        Xmx_slider.value = this.value;
+    }
+
+    Xms_slider.oninput = function () {
+        Xms_value.value = this.value;
+    }
+
+    Xms_value.oninput = function () {
+        Xms_slider.value = this.value;
+    }
+
+
+
 
 
     //properties
@@ -212,13 +273,14 @@ function loadServer(server_id) {
             input.style.borderWidth = "1px";
             input.style.backgroundColor = "transparent";
             input.style.fontSize = "15px";
-            
+
 
             span.appendChild(input);
         }
 
         li.style.padding = "0px";
         li.style.marginTop = "0px";
+
 
         li.appendChild(span);
         ul.appendChild(li);
@@ -288,14 +350,51 @@ function resetChanges() {
 
 }
 
+function delay(time) {
+  return new Promise(resolve => setTimeout(resolve, time));
+}
+
 function startServer() {
-    //start server
+    //create StartServer.bat file and run it
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+
     var server_path = data[active_server_id].path;
 
-    //still have no idea how to do this
+    var server_data = JSON.parse(fs.readFileSync(server_path + '/server.json', 'utf8'));
 
-    var cp = require('child_process');
-    //cp.exec("C:\\Users\\Vito\\Downloads\\Above+and+Beyond-TWO-1.3-Server\\start - Shortcut.lnk");
+    var ram_min = document.getElementById('Xms_value').value;
+    var ram_max = document.getElementById('Xmx_value').value;
+    var server_jar = document.getElementById('server_jar').value;
 
+    server_data.args.Xmx = ram_max;
+    server_data.args.Xms = ram_min;
+    server_data.args.jar = server_jar;
+
+    fs.writeFileSync(server_path + '/server.json', JSON.stringify(server_data, null, 4));
+
+
+    var output = '';
+    output += 'cd /d "' + server_path + '"\n';
+    output += 'java -Xmx' + document.getElementById('Xmx_value').value + 'M -Xms' + document.getElementById('Xms_value').value + 'M -jar ' + document.getElementById('server_jar').value + ' nogui\n';
+
+    fs.writeFileSync(server_path + '/StartServer.bat', output);
+
+
+
+    var child_process = require('child_process');
+
+    var startpath = server_path + '/StartServer.bat';
+
+    if (config.useWindowsTerminal) {
+        child_process.exec("start wt.exe " + startpath);
+    } else {
+        child_process.exec("start " + startpath);
+    }
+
+   
+    if (config.closeOnServerStart) {
+        delay(2000).then(() => {
+            window.close();
+        });
+    }
 }

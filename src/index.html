@@ -36,16 +36,37 @@
       </div>
       <input type="file" name="" id="" multiple>
 
+      <hr>
+      <h2>Start server</h2>
+
+      <div style="display: table;">
+
+      <p style="display: table-row;">Xms (Min ram)</p>
+      <input type="range" id="Xms_slider" style="width: 250px; display: table-cell;" step="2" value="0">
+      <input type="number" id="Xms_value" style="width:75px; display: table-cell;" step="2" value="0">
+
+      <p style="display: table-row;">Xmx (Max ram)</p>
+      <input type="range" id="Xmx_slider" style="width: 250px; display: table-cell;" step="2" value="0">
+      <input type="number" id="Xmx_value" style="width:75px; display: table-cell;" step="2" value="0">
+
+      </div>
+
+      <input type="text" id="server_jar" value="Server jar file">
+
+      <br>
+
+
       <button onclick="startServer();">start server</button>
 
       <hr>
       <h2>Server properties</h2>
-      <div id="server_properties">
-        <ul id="server_properties" style="font-size: 2px;"></ul>
-      </div>
 
       <button onclick="saveServerProperties();">save shanges</button>
       <button onclick="resetChanges();">reset changes</button>
+
+      <div id="server_properties">
+        <ul id="server_properties" style="font-size: 2px;"></ul>
+      </div>
 
     </div>
 

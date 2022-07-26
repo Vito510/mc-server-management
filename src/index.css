@@ -1,0 +1,25 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
+  overflow: hidden;
+  height: 100vh;
+}
+
+div.scrollmenu {
+  overflow-y: auto;
+  float: left;
+  height: 100%;
+  width: 20%;
+}
+
+div.main {
+  float: right;
+  width: 80%;
+}
+
+ul.serverlist {
+  list-style-type: none;
+  display: block;
+  padding: 0;
+  margin: 0;
+}

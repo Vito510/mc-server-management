@@ -1,13 +1,29 @@
 const fs = require('fs');
+
 var active_server_id = 0;
+var temp_settings_data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+
+//startup
+loadIntoBar();
+
+//load config
+var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+document.getElementById("path_input").value = config.search_path;
+
+function saveConfig() {
+    //save config to config.json
+    fs.writeFileSync('config.json', JSON.stringify(config, null, 4));
+}
+
 
 function listFiles() {
     //find all server folders and parse their properties
     const path = require('path');
 
     const directoryPath = document.getElementById("path_input").value.split(',');
-
-    console.log(directoryPath);
+    //save path to config
+    config.search_path = document.getElementById("path_input").value;
+    saveConfig();
 
     var server_list = [];
 
@@ -42,7 +58,15 @@ function listFiles() {
     //parse server.properties files
     server_list.forEach(element => {
         var server_properties = fs.readFileSync(element + '/server.properties', 'utf8');
+        var server_images;
         data_temp = {};
+
+        //check if server_images.json exists
+        if (fs.existsSync(element + '/server_images.json')) {
+            server_images = JSON.parse(fs.readFileSync(element + '/server_images.json', 'utf8'));
+        }
+
+
         //for each line in the server.properties file
         server_properties.split('\n').forEach(line => {
             //if the line starts with a #, ignore it
@@ -65,7 +89,7 @@ function listFiles() {
                 data_temp[property[0]] = property[1];
             }
         });
-        let j = { 'id': count, 'name': element.split('\\').pop(), 'path': element, 'images': [], 'properties': data_temp };
+        let j = { 'id': count, 'name': element.split('\\').pop(), 'path': element, 'images': server_images, 'properties': data_temp };
         data[count.toString()] = j;
         count++;
     });
@@ -108,20 +132,43 @@ function loadIntoBar() {
 }
 
 function loadServer(server_id) {
-    //load server details into main page
+    /**
+    *load server details into main page
+    **/
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
     data = data[server_id];
     active_server_id = server_id;
 
-    //console.log(data);
-
-    hideDiv('settings_screen');
-    showDiv('server_screen');
-
+    //general info
     document.getElementById('server_name').innerHTML = data.name;
     document.getElementById('server_path').innerHTML = data.path;
     document.getElementById('server_motd').innerHTML = data.properties.motd;
 
+
+    //images
+    var images = data.images;
+
+    var image_container = document.getElementById("server_images");
+
+    //remove all children (images)
+
+    while (image_container.firstChild) {
+        image_container.removeChild(image_container.firstChild);
+    }
+
+    if (images != undefined) {
+
+        images.forEach(item => {
+            var img = document.createElement("img");
+            img.src = item;
+            img.style.width = "30%";
+            img.style.paddingRight = "2%";
+            image_container.appendChild(img);
+        });
+    }
+
+
+    //properties
     var ul = document.getElementById("server_properties");
 
     //remove all children
@@ -131,7 +178,7 @@ function loadServer(server_id) {
 
     for (var key in data.properties) {
         var li = document.createElement("li");
-        li.setAttribute("class", "server_properties");
+        li.style.listStyleType = "none";
 
 
         //li.innerHTML = key + ': ' + data.properties[key];
@@ -139,7 +186,10 @@ function loadServer(server_id) {
 
 
         var span = document.createElement("span");
+
+        //due to the defer of the json file, the css file is ignored        
         span.innerHTML = key + ":";
+        span.style.fontSize = "15px";
 
         //if property is a boolean, create a checkbox
         if (typeof data.properties[key] == 'boolean') {
@@ -148,6 +198,7 @@ function loadServer(server_id) {
             checkbox.setAttribute("id", key);
             checkbox.setAttribute("onclick", "updateProperty(this.id, this.checked)");
             checkbox.checked = data.properties[key];
+
             span.appendChild(checkbox);
         } else {
             var input = document.createElement("input");
@@ -155,8 +206,19 @@ function loadServer(server_id) {
             input.setAttribute("id", key);
             input.setAttribute("value", data.properties[key]);
             input.setAttribute("onchange", "updateProperty(this.id, this.value)");
+
+            input.style.border = "none";
+            input.style.borderStyle = "solid";
+            input.style.borderWidth = "1px";
+            input.style.backgroundColor = "transparent";
+            input.style.fontSize = "15px";
+            
+
             span.appendChild(input);
         }
+
+        li.style.padding = "0px";
+        li.style.marginTop = "0px";
 
         li.appendChild(span);
         ul.appendChild(li);
@@ -164,7 +226,8 @@ function loadServer(server_id) {
     }
 
 
-    //server properties
+    hideDiv('settings_screen');
+    showDiv('server_screen');
 
 
 }
@@ -186,32 +249,17 @@ function showSettings() {
 
 function updateProperty(property, value) {
     //update property in server_list.json
-    var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
-    data[active_server_id]['properties'][property] = value;
-    fs.writeFileSync('server_list.json', JSON.stringify(data, null, 4));
+    temp_settings_data[active_server_id]['properties'][property] = value;
 
 }
 
-// function saveServerProperties() {
-//     //save server properties to server.properties
-//     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
-//     var server_properties = data[active_server_id].properties;
-//     var server_path = data[active_server_id].path;
-
-//     var server_properties_file = fs.readFileSync(server_path + '/server.properties', 'utf8');
-
-//     console.log(server_properties_file);
-//     for (var key in server_properties) {
-//         var line = key + '=' + server_properties[key] + '\r\n';
-//         server_properties_file = server_properties_file.replace(new RegExp(key + '=.*\r\n', 'g'), line);
-//     }
-
-//     fs.writeFileSync(server_path + '/server.properties', server_properties_file);
-//     console.log('saved');
-// }
 
 function saveServerProperties() {
     //save server properties to server.properties
+
+    console.log(temp_settings_data)
+    fs.writeFileSync('server_list.json', JSON.stringify(temp_settings_data, null, 4));
+
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
     var server_properties = data[active_server_id].properties;
     var server_path = data[active_server_id].path;
@@ -230,11 +278,24 @@ function saveServerProperties() {
 
     fs.writeFileSync(server_path + '/server.properties', output);
     console.log('saved');
+    loadServer(active_server_id);
 }
 
 function resetChanges() {
 
     listFiles();
     loadServer(active_server_id);
+
+}
+
+function startServer() {
+    //start server
+    var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+    var server_path = data[active_server_id].path;
+
+    //still have no idea how to do this
+
+    var cp = require('child_process');
+    //cp.exec("C:\\Users\\Vito\\Downloads\\Above+and+Beyond-TWO-1.3-Server\\start - Shortcut.lnk");
 
 }

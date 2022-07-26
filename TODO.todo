@@ -1,5 +1,6 @@
-- Start server, with args
-- Display server properties
-- Display server images (Mannualy add images to server properties)
-- Modify server properties
-- Internal server console (Maybe)
+☐ - Start server, with args
+☐ - Display server properties
+☐ - Display server images (Mannualy add images to server properties)
+☐ - Modify server properties
+☐ - Internal server console (Maybe)
+☐ - Automatic modpack mods update

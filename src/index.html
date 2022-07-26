@@ -1,48 +1,58 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Minecraft server managemnt</title>
-    <link rel="stylesheet" href="index.css" />
-    <script src="main.js"></script>
-  </head>
 
-  <body>
-    
-    <div class="scrollmenu">
-      <ul id="serverlist" class="serverlist">
-        <button style="width: 100%;" onclick="showSettings();">Settings</button>
-      </ul>
-    </div>
+<head>
+  <meta charset="UTF-8" />
+  <title>Minecraft server managemnt</title>
+  <script defer src="main.js"></script>
+  <link rel="stylesheet" href="index.css" />
+</head>
 
-    <div class="main">
+<body>
 
-      <div id="settings_screen" class="settings_screen">
-              <h1>💖 Hello World!</h1>
+  <div class="scrollmenu">
+    <ul id="serverlist" class="serverlist">
+      <button style="width: 100%;" onclick="showSettings();">Settings</button>
+    </ul>
+  </div>
+
+  <div class="main">
+
+    <div id="settings_screen" class="settings_screen">
+      <h1>💖 Hello World!</h1>
       <p>Enter search paths (separate with comma)</p>
 
       <input type="text" value="C:/Users/Vito/Downloads" id="path_input" style="width: 50%;">
 
       <input type="button" value="rescan server list" onclick="listFiles();">
+    </div>
+
+    <div id="server_screen" class="server_screen">
+      <h1 id="server_name" style="text-align: center;"></h1>
+      <h2 id="server_motd"></h2>
+      <h3 id="server_path"></h3>
+
+      <div id="server_images">
+      </div>
+      <input type="file" name="" id="" multiple>
+
+      <button onclick="startServer();">start server</button>
+
+      <hr>
+      <h2>Server properties</h2>
+      <div id="server_properties">
+        <ul id="server_properties" style="font-size: 2px;"></ul>
       </div>
 
-      <div id="server_screen" class="server_screen">
-        <h1 id="server_name" style="text-align: center;"></h1>
-        <h2 id="server_motd"></h2>
-        <h3 id="server_path"></h3>
-
-        <div id="server_properties">
-          <ul id="server_properties"></ul>
-        </div>
-
-        <button onclick="saveServerProperties();">save shanges</button>   
-        <button onclick="resetChanges();">reset changes</button>     
-
-      </div>
-      
+      <button onclick="saveServerProperties();">save shanges</button>
+      <button onclick="resetChanges();">reset changes</button>
 
     </div>
 
 
-  </body>
+  </div>
+
+
+</body>
+
 </html>

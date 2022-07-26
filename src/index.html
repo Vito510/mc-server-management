@@ -19,15 +19,25 @@
 
       <div id="settings_screen" class="settings_screen">
               <h1>💖 Hello World!</h1>
-      <p>Welcome to your Electron application.</p>
+      <p>Enter search paths (separate with comma)</p>
 
-      <input type="text" value="C:/Users/Vito/Downloads" id="path_input">
+      <input type="text" value="C:/Users/Vito/Downloads" id="path_input" style="width: 50%;">
 
       <input type="button" value="rescan server list" onclick="listFiles();">
       </div>
 
       <div id="server_screen" class="server_screen">
         <h1 id="server_name" style="text-align: center;"></h1>
+        <h2 id="server_motd"></h2>
+        <h3 id="server_path"></h3>
+
+        <div id="server_properties">
+          <ul id="server_properties"></ul>
+        </div>
+
+        <button onclick="saveServerProperties();">save shanges</button>   
+        <button onclick="resetChanges();">reset changes</button>     
+
       </div>
       
 

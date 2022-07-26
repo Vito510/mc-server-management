@@ -20,17 +20,21 @@ div.main {
 }
 
 div.settings_screen {
+  overflow-y: auto;
   float: right;
   width: 80%;
   display: block;
   background-color: salmon;
+  height: 100vh; /* 100vh is required for scrolling to work :) */
 }
 
 div.server_screen {
+  overflow-y: auto;
   float: right;
   width: 80%;
   display: none;
   background-color: salmon;
+  height: 100vh;
 }
 
 ul.serverlist {
@@ -39,3 +43,18 @@ ul.serverlist {
   padding: 0;
   margin: 0;
 }
+
+ul.server_properties {
+  list-style-type: none;
+  display: block;
+  padding: 0;
+  margin: 0;
+}
+
+ul.server_properties span {
+  display: inline-block;
+  width: 100px;
+  text-align: right;
+  padding-right: 10px;
+}
+

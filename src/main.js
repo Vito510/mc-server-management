@@ -1,30 +1,38 @@
 const fs = require('fs');
+var active_server_id = 0;
 
 function listFiles() {
+    //find all server folders and parse their properties
     const path = require('path');
 
-    const directoryPath = document.getElementById("path_input").value;
+    const directoryPath = document.getElementById("path_input").value.split(',');
+
+    console.log(directoryPath);
 
     var server_list = [];
 
-    //find all server folders in the directory
-    fs.readdirSync(directoryPath).forEach(element => {
+    directoryPath.forEach(server_path => {
+        //find all server folders in the directory
 
-        //merge paths
-        absoulutePath = path.join(directoryPath, element);
+        server_path = server_path.trim();
 
+        fs.readdirSync(server_path).forEach(element => {
 
-        if (fs.lstatSync(absoulutePath).isDirectory() && fs.readdirSync(absoulutePath).includes('server.properties')) {
-            console.log(element, 'contains server.properties');
-            server_list.push(absoulutePath);
-        } else if (fs.lstatSync(absoulutePath).isDirectory()) {
-            console.log(element, "doesn't contain server files");
-        }
+            //merge paths
+            absoulutePath = path.join(server_path, element);
 
 
+            if (fs.lstatSync(absoulutePath).isDirectory() && fs.readdirSync(absoulutePath).includes('server.properties')) {
+                console.log(element, 'contains server.properties');
+                server_list.push(absoulutePath);
+            } else if (fs.lstatSync(absoulutePath).isDirectory()) {
+                console.log(element, "doesn't contain server files");
+            }
+
+
+        });
     });
 
-    //console.log(server_list);
 
     var data = {}
     var data_temp = {}
@@ -34,6 +42,7 @@ function listFiles() {
     //parse server.properties files
     server_list.forEach(element => {
         var server_properties = fs.readFileSync(element + '/server.properties', 'utf8');
+        data_temp = {};
         //for each line in the server.properties file
         server_properties.split('\n').forEach(line => {
             //if the line starts with a #, ignore it
@@ -102,27 +111,130 @@ function loadServer(server_id) {
     //load server details into main page
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
     data = data[server_id];
+    active_server_id = server_id;
 
     //console.log(data);
-    
+
     hideDiv('settings_screen');
     showDiv('server_screen');
 
     document.getElementById('server_name').innerHTML = data.name;
+    document.getElementById('server_path').innerHTML = data.path;
+    document.getElementById('server_motd').innerHTML = data.properties.motd;
+
+    var ul = document.getElementById("server_properties");
+
+    //remove all children
+    while (ul.firstChild) {
+        ul.removeChild(ul.firstChild);
+    }
+
+    for (var key in data.properties) {
+        var li = document.createElement("li");
+        li.setAttribute("class", "server_properties");
+
+
+        //li.innerHTML = key + ': ' + data.properties[key];
+        //ul.appendChild(li);
+
+
+        var span = document.createElement("span");
+        span.innerHTML = key + ":";
+
+        //if property is a boolean, create a checkbox
+        if (typeof data.properties[key] == 'boolean') {
+            var checkbox = document.createElement("input");
+            checkbox.setAttribute("type", "checkbox");
+            checkbox.setAttribute("id", key);
+            checkbox.setAttribute("onclick", "updateProperty(this.id, this.checked)");
+            checkbox.checked = data.properties[key];
+            span.appendChild(checkbox);
+        } else {
+            var input = document.createElement("input");
+            input.setAttribute("type", "text");
+            input.setAttribute("id", key);
+            input.setAttribute("value", data.properties[key]);
+            input.setAttribute("onchange", "updateProperty(this.id, this.value)");
+            span.appendChild(input);
+        }
+
+        li.appendChild(span);
+        ul.appendChild(li);
+
+    }
+
+
+    //server properties
+
 
 }
 
 function showDiv(div_id) {
-  var x = document.getElementById(div_id);
-  x.style.display = "block";
+    var x = document.getElementById(div_id);
+    x.style.display = "block";
 }
 
 function hideDiv(div_id) {
-  var x = document.getElementById(div_id);
-  x.style.display = "none";
+    var x = document.getElementById(div_id);
+    x.style.display = "none";
 }
 
 function showSettings() {
     hideDiv('server_screen');
     showDiv('settings_screen');
+}
+
+function updateProperty(property, value) {
+    //update property in server_list.json
+    var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+    data[active_server_id]['properties'][property] = value;
+    fs.writeFileSync('server_list.json', JSON.stringify(data, null, 4));
+
+}
+
+// function saveServerProperties() {
+//     //save server properties to server.properties
+//     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+//     var server_properties = data[active_server_id].properties;
+//     var server_path = data[active_server_id].path;
+
+//     var server_properties_file = fs.readFileSync(server_path + '/server.properties', 'utf8');
+
+//     console.log(server_properties_file);
+//     for (var key in server_properties) {
+//         var line = key + '=' + server_properties[key] + '\r\n';
+//         server_properties_file = server_properties_file.replace(new RegExp(key + '=.*\r\n', 'g'), line);
+//     }
+
+//     fs.writeFileSync(server_path + '/server.properties', server_properties_file);
+//     console.log('saved');
+// }
+
+function saveServerProperties() {
+    //save server properties to server.properties
+    var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+    var server_properties = data[active_server_id].properties;
+    var server_path = data[active_server_id].path;
+
+    var output = '';
+
+    //get first two lines of server.properties
+    var server_properties_file = fs.readFileSync(server_path + '/server.properties', 'utf8');
+    var lines = server_properties_file.split('\n');
+    output += lines[0] + '\n' + lines[1] + '\n';
+
+    //merge rest
+    for (var key in server_properties) {
+        output += key + '=' + server_properties[key] + '\n';
+    }
+
+    fs.writeFileSync(server_path + '/server.properties', output);
+    console.log('saved');
+}
+
+function resetChanges() {
+
+    listFiles();
+    loadServer(active_server_id);
+
 }

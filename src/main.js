@@ -1,8 +1,9 @@
+const fs = require('fs');
+
 function listFiles() {
-    const fs = require('fs');
     const path = require('path');
 
-    const directoryPath = "C:/Users/Vito/Downloads";
+    const directoryPath = document.getElementById("path_input").value;
 
     var server_list = [];
 
@@ -10,7 +11,7 @@ function listFiles() {
     fs.readdirSync(directoryPath).forEach(element => {
 
         //merge paths
-        absoulutePath = path.join(directoryPath, element); 
+        absoulutePath = path.join(directoryPath, element);
 
 
         if (fs.lstatSync(absoulutePath).isDirectory() && fs.readdirSync(absoulutePath).includes('server.properties')) {
@@ -55,7 +56,7 @@ function listFiles() {
                 data_temp[property[0]] = property[1];
             }
         });
-        let j = {'id':count,'name': element.split('\\').pop(),'path': element,'properties': data_temp};
+        let j = { 'id': count, 'name': element.split('\\').pop(), 'path': element, 'images': [], 'properties': data_temp };
         data[count.toString()] = j;
         count++;
     });
@@ -63,4 +64,65 @@ function listFiles() {
     //convert data to json and save to file
     fs.writeFileSync('server_list.json', JSON.stringify(data, null, 4));
 
+    loadIntoBar();
+
+}
+
+function loadIntoBar() {
+    //load server_list.json into the scrollbar
+    var ul = document.getElementById("serverlist");
+
+    //remove all children, except the first one
+    for (var i = ul.children.length - 1; i > 0; i--) {
+        ul.removeChild(ul.children[i]);
+    }
+
+
+
+    var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+
+    for (var key in data) {
+
+        var li = document.createElement("li");
+        var button = document.createElement("button");
+
+        button.setAttribute("id", data[key].id);
+        button.setAttribute("onclick", "loadServer(this.id)");
+        button.style.width = "100%";
+        button.innerHTML = data[key].name;
+
+        li.appendChild(button);
+        ul.appendChild(li);
+
+    }
+
+}
+
+function loadServer(server_id) {
+    //load server details into main page
+    var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+    data = data[server_id];
+
+    //console.log(data);
+    
+    hideDiv('settings_screen');
+    showDiv('server_screen');
+
+    document.getElementById('server_name').innerHTML = data.name;
+
+}
+
+function showDiv(div_id) {
+  var x = document.getElementById(div_id);
+  x.style.display = "block";
+}
+
+function hideDiv(div_id) {
+  var x = document.getElementById(div_id);
+  x.style.display = "none";
+}
+
+function showSettings() {
+    hideDiv('server_screen');
+    showDiv('settings_screen');
 }

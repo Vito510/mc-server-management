@@ -3,6 +3,8 @@ body {
     Arial, sans-serif;
   overflow: hidden;
   height: 100vh;
+  background-color: violet;
+  margin: 0;
 }
 
 div.scrollmenu {
@@ -10,11 +12,25 @@ div.scrollmenu {
   float: left;
   height: 100%;
   width: 20%;
+  background-color: aqua;
 }
 
 div.main {
+  background-color: aquamarine;
+}
+
+div.settings_screen {
   float: right;
   width: 80%;
+  display: block;
+  background-color: salmon;
+}
+
+div.server_screen {
+  float: right;
+  width: 80%;
+  display: none;
+  background-color: salmon;
 }
 
 ul.serverlist {

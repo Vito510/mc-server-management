@@ -2,7 +2,8 @@
 ✔ - Display server properties @done (7/27/2022, 9:57:18 AM)
 ☐ - Display server images (Manually add images to server properties)
 ✔ - Modify server properties @done (7/27/2022, 9:57:05 AM)
-☐ - Automatic modpack mods update
+✘ - Automatic modpack mods update @cancelled (7/27/2022, 1:18:38 PM)
 ☐ - Add ops, whitelist, banned-players, banned-ips management
 ☐ - Add world backup option
+✔ - Add specific input types for certain server properties @done (7/27/2022, 1:18:26 PM)
 ☐ - Make it look at least not like shit

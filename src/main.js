@@ -163,6 +163,8 @@ function loadServer(server_id) {
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
     var startup_data = JSON.parse(fs.readFileSync(data[server_id].path + '/server.json', 'utf8'));
 
+    document.getElementById("input_server_images").files = undefined;
+
     temp_settings_data = data;
 
     data = data[server_id];
@@ -175,8 +177,38 @@ function loadServer(server_id) {
 
 
     //images
-    var images = data.images;
 
+    var image_input = document.getElementById('input_server_images');
+    var images;
+
+    image_input.oninput = function () {
+        //update images
+        var images_temp = image_input.files;
+        image_input.files = undefined;
+
+        //for each image
+
+        for (var i = 0; i < images_temp.length; i++) {
+            if (i > 3) {break;}
+            images.push(images_temp[i]['path']);
+        }
+
+        //save images to server.json
+        startup_data.images = images;
+        fs.writeFileSync(data.path + '/server.json', JSON.stringify(startup_data, null, 4));
+        loadServer(active_server_id);
+    }
+
+    if (startup_data.images != undefined) {
+        images = startup_data.images;
+    }
+
+    //limit number of images to 3
+    if (images.length > 3) {
+        //get last 3 images
+        images = images.slice(images.length - 3, images.length);
+    }
+    
     var image_container = document.getElementById("server_images");
 
     //remove all children (images)
@@ -303,6 +335,11 @@ function loadServer(server_id) {
     //properties
     var ul = document.getElementById("server_properties");
 
+    var dropdown_properties = {
+        "gamemode": ["survival", "creative", "adventure", "spectator"],
+        "difficulty": ["peaceful", "easy", "normal", "hard"],
+    };
+
     //remove all children
     while (ul.firstChild) {
         ul.removeChild(ul.firstChild);
@@ -323,8 +360,22 @@ function loadServer(server_id) {
         span.innerHTML = key + ":";
         span.style.fontSize = "15px";
 
-        //if property is a boolean, create a checkbox
-        if (typeof data.properties[key] == 'boolean') {
+        //check if the property is a dropdown
+        if (dropdown_properties[key] != undefined) {
+            var select = document.createElement("select");
+            select.id = key;
+            select.setAttribute("onchange", "updateProperty(this.id, this.value)");
+            for (var i = 0; i < dropdown_properties[key].length; i++) {
+                var option = document.createElement("option");
+                option.value = dropdown_properties[key][i];
+                option.innerHTML = dropdown_properties[key][i];
+                select.appendChild(option);
+            }
+            select.value = data.properties[key];
+            span.appendChild(select);
+
+        } else if (typeof data.properties[key] == 'boolean') {
+            //if property is a boolean, create a checkbox
             var checkbox = document.createElement("input");
             checkbox.setAttribute("type", "checkbox");
             checkbox.setAttribute("id", key);
@@ -495,4 +546,13 @@ function removeServerList() {
     //remove server_list.json
     fs.unlinkSync('server_list.json');
     loadIntoBar();
+}
+
+function clearImages() {
+    //remove server_list.json
+    var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+    var server_data = JSON.parse(fs.readFileSync(data[active_server_id].path + '/server.json', 'utf8'));
+    server_data.images = [];
+    fs.writeFileSync(data[active_server_id].path + '/server.json', JSON.stringify(server_data, null, 4));
+    loadServer(active_server_id);
 }

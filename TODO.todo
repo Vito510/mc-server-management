@@ -1,6 +1,8 @@
-☐ - Start server, with args
-☐ - Display server properties
-☐ - Display server images (Mannualy add images to server properties)
-☐ - Modify server properties
-☐ - Internal server console (Maybe)
+✔ - Start server, with args @done (7/27/2022, 9:57:26 AM)
+✔ - Display server properties @done (7/27/2022, 9:57:18 AM)
+☐ - Display server images (Manually add images to server properties)
+✔ - Modify server properties @done (7/27/2022, 9:57:05 AM)
 ☐ - Automatic modpack mods update
+☐ - Add ops, whitelist, banned-players, banned-ips management
+☐ - Add world backup option
+☐ - Make it look at least not like shit

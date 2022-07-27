@@ -93,6 +93,7 @@ archive
 
 #test
 test
+change.txt
 
 #data
 server_list.json

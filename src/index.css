@@ -37,6 +37,12 @@ div.server_screen {
   height: 100vh;
 }
 
+p.smallinfo {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  font-size: 12px;
+}
+
 ul.serverlist {
   list-style-type: none;
   display: block;

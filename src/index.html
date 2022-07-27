@@ -20,11 +20,17 @@
 
     <div id="settings_screen" class="settings_screen">
       <h1>💖 Hello World!</h1>
-      <p>Enter search paths (separate with comma)</p>
+      <p style="margin-bottom: 0%;">Enter search paths (separate with comma)</p>
 
       <input type="text" value="C:/Users/Vito/Downloads" id="path_input" style="width: 50%;">
 
       <input type="button" value="rescan server list" onclick="listFiles();">
+
+      <input type="button" value="delete server list" onclick="removeServerList();">
+
+      <p class="smallinfo" id="p_java_path" style="margin-top: 10px;"></p>
+      <p class="smallinfo" id="p_java_count"></p>
+
     </div>
 
     <div id="server_screen" class="server_screen">
@@ -41,19 +47,22 @@
 
       <div style="display: table;">
 
-      <p style="display: table-row;">Xms (Min ram)</p>
-      <input type="range" id="Xms_slider" style="width: 250px; display: table-cell;" step="2" value="0">
-      <input type="number" id="Xms_value" style="width:75px; display: table-cell;" step="2" value="0">
+      <p style="display: table-row;">Xms (Min ram) MB</p>
+      <input type="range" id="Xms_slider" style="width: 250px; display: table-cell;" step="1024" value="0">
+      <input type="number" id="Xms_value" style="width:75px; display: table-cell;" step="1024" value="0">
 
-      <p style="display: table-row;">Xmx (Max ram)</p>
-      <input type="range" id="Xmx_slider" style="width: 250px; display: table-cell;" step="2" value="0">
-      <input type="number" id="Xmx_value" style="width:75px; display: table-cell;" step="2" value="0">
+      <p style="display: table-row;">Xmx (Max ram) MB</p>
+      <input type="range" id="Xmx_slider" style="width: 250px; display: table-cell;" step="1024" value="0">
+      <input type="number" id="Xmx_value" style="width:75px; display: table-cell;" step="1024" value="0">
 
       </div>
 
       <select name="server_jar" id="server_jar"></select>
 
       <select name="java_version" id="java_version"></select>
+      <br>
+      <span>Enable server GUI</span>
+      <input type="checkbox" name="gui" id="gui">
 
       <br>
 

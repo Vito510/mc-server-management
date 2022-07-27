@@ -2,10 +2,10 @@ const fs = require('fs');
 const os = require('os');
 
 const system_memory = os.totalmem() / 1024 / 1024;
-const java_folder = "C:\\Program Files\\Java";
 
 var active_server_id = 0;
-var temp_settings_data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+var temp_settings_data = {};
+
 
 //startup
 loadIntoBar();
@@ -13,6 +13,10 @@ loadIntoBar();
 //load config
 var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 document.getElementById("path_input").value = config.search_path;
+const java_folder = config.java_folder_path
+
+document.getElementById("p_java_path").innerHTML = "Java folder: " + java_folder
+document.getElementById("p_java_count").innerHTML = "Total java versions found: " + fs.readdirSync(java_folder).length
 
 function saveConfig() {
     //save config to config.json
@@ -25,9 +29,16 @@ function listFiles() {
     const path = require('path');
 
     const directoryPath = document.getElementById("path_input").value.split(',');
+    console.log(directoryPath);
     //save path to config
-    config.search_path = document.getElementById("path_input").value;
-    saveConfig();
+
+    try {
+        config.search_path = document.getElementById("path_input").value;
+        saveConfig();
+    } catch (error) {
+        console.log('unable to save path');
+    }
+
 
     var server_list = [];
 
@@ -72,7 +83,7 @@ function listFiles() {
             server_images = server_data.images;
             server_args = server_data.args;
         } else {
-            fs.writeFileSync(element + '/server.json', JSON.stringify({'args':{},'images':[]}, null, 4));
+            fs.writeFileSync(element + '/server.json', JSON.stringify({ 'args': {}, 'images': [] }, null, 4));
         }
 
 
@@ -98,13 +109,15 @@ function listFiles() {
                 data_temp[property[0]] = property[1];
             }
         });
-        let j = { 'id': count, 'name': element.split('\\').pop(), 'path': element, 'args': server_args, 'images': server_images,'properties': data_temp };
+        let j = { 'id': count, 'name': element.split('\\').pop(), 'path': element, 'properties': data_temp };
         data[count.toString()] = j;
         count++;
     });
 
     //convert data to json and save to file
     fs.writeFileSync('server_list.json', JSON.stringify(data, null, 4));
+
+    var temp_settings_data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
 
     loadIntoBar();
 
@@ -119,9 +132,12 @@ function loadIntoBar() {
         ul.removeChild(ul.children[i]);
     }
 
-
-
-    var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+    try {
+        var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+    } catch (error) {
+        console.log('unable to load server list');
+        return;
+    }
 
     for (var key in data) {
 
@@ -146,6 +162,8 @@ function loadServer(server_id) {
     **/
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
     var startup_data = JSON.parse(fs.readFileSync(data[server_id].path + '/server.json', 'utf8'));
+
+    temp_settings_data = data;
 
     data = data[server_id];
     active_server_id = server_id;
@@ -189,7 +207,7 @@ function loadServer(server_id) {
 
     //find all jar files in the server folder
 
-    while(server_jar.firstChild) {
+    while (server_jar.firstChild) {
         server_jar.removeChild(server_jar.firstChild);
     }
 
@@ -206,24 +224,33 @@ function loadServer(server_id) {
 
     var java_version = document.getElementById('java_version');
 
-    while(java_version.firstChild) {
+    while (java_version.firstChild) {
         java_version.removeChild(java_version.firstChild);
     }
 
+    var option = document.createElement("option");
+    option.value = "java";
+    option.innerHTML = "Use system default";
+    java_version.appendChild(option)
+
     fs.readdirSync(java_folder).forEach(element => {
-        var option = document.createElement("option");
-        option.value = java_folder +'\\'+ element + "\\bin\\java.exe";
+        option = document.createElement("option");
+        option.value = '"' + java_folder + '\\' + element + '\\bin\\java.exe"';
         option.innerHTML = element;
         java_version.appendChild(option);
     }
     );
 
 
-
     //ram slider
 
     Xmx_slider.max = system_memory;
     Xms_slider.max = system_memory;
+    Xms_value.max = system_memory;
+    Xmx_value.max = system_memory;
+
+    Xmx_value.min = 0;
+    Xms_value.min = 0;
 
     if (startup_data.args.jar != undefined) {
         Xmx_slider.value = startup_data.args.Xmx;
@@ -262,8 +289,15 @@ function loadServer(server_id) {
         Xms_slider.value = this.value;
     }
 
+    //server gui checkmark
 
+    var gui = document.getElementById('gui')
 
+    if (startup_data.args.gui != undefined) {
+        gui.checked = startup_data.args.gui
+    } else {
+        gui.checked = false
+    }
 
 
     //properties
@@ -388,7 +422,7 @@ function resetChanges() {
 }
 
 function delay(time) {
-  return new Promise(resolve => setTimeout(resolve, time));
+    return new Promise(resolve => setTimeout(resolve, time));
 }
 
 function startServer() {
@@ -413,18 +447,27 @@ function startServer() {
     var ram_max = document.getElementById('Xmx_value').value;
     var server_jar = document.getElementById('server_jar').value;
     var server_java = document.getElementById('java_version').value;
+    var gui = document.getElementById('gui').checked;
 
     server_data.args.Xmx = ram_max;
     server_data.args.Xms = ram_min;
     server_data.args.jar = server_jar;
     server_data.args.java = server_java;
+    server_data.args.gui = gui;
 
     fs.writeFileSync(server_path + '/server.json', JSON.stringify(server_data, null, 4));
 
 
     var output = '';
+
+    var nogui = '';
+
+    if (!gui) {
+        nogui = ' nogui';
+    }
+
     output += 'cd /d "' + server_path + '"\n';
-    output += '"'+server_java+'" -Xmx' + ram_max + 'M -Xms' + ram_min + 'M -jar ' + server_jar + ' nogui\n';
+    output += server_java + ' -Xmx' + ram_max + 'M -Xms' + ram_min + 'M -jar ' + server_jar + nogui + '\n';
 
     fs.writeFileSync(server_path + '\\StartServer.bat', output);
 
@@ -440,10 +483,16 @@ function startServer() {
         child_process.exec("start " + startpath);
     }
 
-   
+
     if (config.closeOnServerStart) {
         delay(2000).then(() => {
             window.close();
         });
     }
+}
+
+function removeServerList() {
+    //remove server_list.json
+    fs.unlinkSync('server_list.json');
+    loadIntoBar();
 }

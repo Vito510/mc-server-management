@@ -1,5 +1,5 @@
 {
     "search_path": "C:/Users/Vito/Downloads, test",
     "useWindowsTerminal": true,
-    "closeOnServerStart": true
+    "closeOnServerStart": false
 }

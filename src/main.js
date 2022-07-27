@@ -2,6 +2,7 @@ const fs = require('fs');
 const os = require('os');
 
 const system_memory = os.totalmem() / 1024 / 1024;
+const java_folder = "C:\\Program Files\\Java";
 
 var active_server_id = 0;
 var temp_settings_data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
@@ -186,6 +187,41 @@ function loadServer(server_id) {
 
     var server_jar = document.getElementById('server_jar');
 
+    //find all jar files in the server folder
+
+    while(server_jar.firstChild) {
+        server_jar.removeChild(server_jar.firstChild);
+    }
+
+    fs.readdirSync(data.path).forEach(element => {
+        if (element.endsWith('.jar') && !element.includes('install')) {
+            var option = document.createElement("option");
+            option.value = element;
+            option.innerHTML = element;
+            server_jar.appendChild(option);
+        }
+    });
+
+    //find all java versions
+
+    var java_version = document.getElementById('java_version');
+
+    while(java_version.firstChild) {
+        java_version.removeChild(java_version.firstChild);
+    }
+
+    fs.readdirSync(java_folder).forEach(element => {
+        var option = document.createElement("option");
+        option.value = java_folder +'\\'+ element + "\\bin\\java.exe";
+        option.innerHTML = element;
+        java_version.appendChild(option);
+    }
+    );
+
+
+
+    //ram slider
+
     Xmx_slider.max = system_memory;
     Xms_slider.max = system_memory;
 
@@ -197,6 +233,7 @@ function loadServer(server_id) {
         Xms_value.value = startup_data.args.Xms;
 
         server_jar.value = startup_data.args.jar;
+        java_version.value = startup_data.args.java;
     } else {
         Xmx_slider.value = 0;
         Xmx_value.value = 0;
@@ -355,6 +392,16 @@ function delay(time) {
 }
 
 function startServer() {
+
+    //check if jar is defined
+    var server_jar = document.getElementById('server_jar');
+    if (server_jar.value == "Server jar filename") {
+        //dialog.showErrorBox("Error", "Please select a server jar file");
+        console.log("Please select a server jar file");
+        return;
+    }
+
+
     //create StartServer.bat file and run it
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
 
@@ -365,19 +412,21 @@ function startServer() {
     var ram_min = document.getElementById('Xms_value').value;
     var ram_max = document.getElementById('Xmx_value').value;
     var server_jar = document.getElementById('server_jar').value;
+    var server_java = document.getElementById('java_version').value;
 
     server_data.args.Xmx = ram_max;
     server_data.args.Xms = ram_min;
     server_data.args.jar = server_jar;
+    server_data.args.java = server_java;
 
     fs.writeFileSync(server_path + '/server.json', JSON.stringify(server_data, null, 4));
 
 
     var output = '';
     output += 'cd /d "' + server_path + '"\n';
-    output += 'java -Xmx' + document.getElementById('Xmx_value').value + 'M -Xms' + document.getElementById('Xms_value').value + 'M -jar ' + document.getElementById('server_jar').value + ' nogui\n';
+    output += '"'+server_java+'" -Xmx' + ram_max + 'M -Xms' + ram_min + 'M -jar ' + server_jar + ' nogui\n';
 
-    fs.writeFileSync(server_path + '/StartServer.bat', output);
+    fs.writeFileSync(server_path + '\\StartServer.bat', output);
 
 
 

@@ -1,6 +1,6 @@
 ✔ - Start server, with args @done (7/27/2022, 9:57:26 AM)
 ✔ - Display server properties @done (7/27/2022, 9:57:18 AM)
-☐ - Display server images (Manually add images to server properties)
+✔ - Display server images (Manually add images to server properties) @done (7/27/2022, 2:50:07 PM)
 ✔ - Modify server properties @done (7/27/2022, 9:57:05 AM)
 ✘ - Automatic modpack mods update @cancelled (7/27/2022, 1:18:38 PM)
 ☐ - Add ops, whitelist, banned-players, banned-ips management

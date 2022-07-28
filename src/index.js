@@ -11,7 +11,7 @@ const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     autoHideMenuBar: true,
-    width: 800,
+    width: 900,
     height: 600,
     webPreferences: {
       enableRemoteModule: true,

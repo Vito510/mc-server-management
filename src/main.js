@@ -1,10 +1,13 @@
 const fs = require('fs');
 const os = require('os');
 
+
 const system_memory = os.totalmem() / 1024 / 1024;
 
-var active_server_id = 0;
+var active_server_id = -1;
 var temp_settings_data = {};
+
+var disable_switch = false;
 
 
 //startup
@@ -73,8 +76,6 @@ function listFiles() {
     //parse server.properties files
     server_list.forEach(element => {
         var server_properties = fs.readFileSync(element + '/server.properties', 'utf8');
-        var server_images;
-        var server_args;
         data_temp = {};
 
         //check if server.json exists
@@ -160,8 +161,14 @@ function loadServer(server_id) {
     /**
     *load server details into main page
     **/
+
+    if (disable_switch || active_server_id == server_id) {
+        return;
+    }
+
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
     var startup_data = JSON.parse(fs.readFileSync(data[server_id].path + '/server.json', 'utf8'));
+
 
     document.getElementById("input_server_images").files = undefined;
 
@@ -171,6 +178,16 @@ function loadServer(server_id) {
     active_server_id = server_id;
 
     //general info
+
+    //check if server-icon exists
+    if (fs.existsSync(data.path + '/server-icon.png')) {
+        document.getElementById("server_icon").src = data.path + '/server-icon.png';
+        document.getElementById("server_icon").title = '';
+    } else {
+        document.getElementById("server_icon").src = 'https://via.placeholder.com/64';
+        document.getElementById("server_icon").title = 'add server-icon.png to the server folder (must be 64x64)';
+    }
+
     document.getElementById('server_name').innerHTML = data.name;
     document.getElementById('server_path').innerHTML = data.path;
     document.getElementById('server_motd').innerHTML = data.properties.motd;
@@ -189,7 +206,7 @@ function loadServer(server_id) {
         //for each image
 
         for (var i = 0; i < images_temp.length; i++) {
-            if (i > 3) {break;}
+            if (i > 3) { break; }
             images.push(images_temp[i]['path']);
         }
 
@@ -208,7 +225,7 @@ function loadServer(server_id) {
         //get last 3 images
         images = images.slice(images.length - 3, images.length);
     }
-    
+
     var image_container = document.getElementById("server_images");
 
     //remove all children (images)
@@ -224,6 +241,11 @@ function loadServer(server_id) {
             img.src = item;
             img.style.width = "30%";
             img.style.paddingRight = "2%";
+            //on click
+            img.onclick = function () {
+                openImage(this.src);
+            }
+            img.style.cursor = 'pointer';
             image_container.appendChild(img);
         });
     }
@@ -331,6 +353,36 @@ function loadServer(server_id) {
         gui.checked = false
     }
 
+    //world
+
+    document.getElementById('world_name').innerHTML = 'World name: ' + data.properties['level-name'];
+
+    //check if world exists
+    if (fs.existsSync(data.path + '\\' + data.properties['level-name'])) {
+        //get folder size
+        var size = getFolderSize(data.path + '\\' + data.properties['level-name']);
+        document.getElementById('world_size').innerHTML = 'World size: ' + (size / 1024 / 1024).toFixed(2) + ' MB';
+    } else {
+        document.getElementById('world_size').innerHTML = 'World size: N/A';
+    }
+
+    //count amount of .dat files in world/playerdata
+
+    var playerdata_files = 0;
+    var player_uuid = [];
+
+    fs.readdirSync(data.path + '\\' + data.properties['level-name'] + '\\playerdata').forEach(element => {
+        if (element.endsWith('.dat')) {
+            playerdata_files++;
+            player_uuid.push(element.replace('.dat', ''));
+        }
+    }
+    );
+
+    document.getElementById('player_data_count').innerHTML = 'Total player count: ' + playerdata_files;
+
+
+
 
     //properties
     var ul = document.getElementById("server_properties");
@@ -409,6 +461,9 @@ function loadServer(server_id) {
 
     }
 
+    //player list
+    loadPlayerData(player_uuid);
+
 
     hideDiv('settings_screen');
     showDiv('server_screen');
@@ -426,7 +481,22 @@ function hideDiv(div_id) {
     x.style.display = "none";
 }
 
+function toggleDiv(div_id) {
+    var x = document.getElementById(div_id);
+    if (x.style.display == "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+
+
 function showSettings() {
+
+    if (disable_switch) {
+        return;
+    }
+
     hideDiv('server_screen');
     showDiv('settings_screen');
 }
@@ -555,4 +625,154 @@ function clearImages() {
     server_data.images = [];
     fs.writeFileSync(data[active_server_id].path + '/server.json', JSON.stringify(server_data, null, 4));
     loadServer(active_server_id);
+}
+
+function openFolder() {
+    var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+    var server_path = data[active_server_id].path;
+    var child_process = require('child_process');
+    child_process.exec("explorer " + server_path);
+}
+
+function openImage(src) {
+    src = src.replace('file:///', '');
+    //replace all %20 with spaces
+    src = src.replace(/%20/g, ' ');
+    var child_process = require('child_process');
+    child_process.exec('"' + src + '"');
+}
+
+function getFolderSize(folder) {
+    var size = 0;
+    var files = fs.readdirSync(folder);
+    for (var i = 0; i < files.length; i++) {
+        var file = folder + '\\' + files[i];
+        if (fs.statSync(file).isDirectory()) size += getFolderSize(file);
+        else size += fs.statSync(file).size;
+    }
+    return size;
+}
+
+function backupWorld() {
+    //create a backup folder if it doesn't exist
+    var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+    var server_path = data[active_server_id].path;
+    var backup_path = server_path + '\\backup';
+
+    if (!fs.existsSync(backup_path)) {
+        fs.mkdirSync(backup_path);
+    }
+
+    var status = document.getElementById('backup_status');
+
+    status.innerHTML = 'Backing up world, please wait...';
+
+    disable_switch = true;
+
+    status.style.color = 'yellow';
+    //create a backup folder if it doesn't exist
+    var archiver = require('archiver');
+
+
+    var today = new Date();
+    var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    var time = today.getHours() + "-" + today.getMinutes();
+    var dateTime = date + '-' + time;
+
+    var out_name = data[active_server_id].properties['level-name'] + '_' + dateTime + '.zip';
+
+    var output = fs.createWriteStream(backup_path + '\\' + out_name);
+    var archive = archiver('zip', {
+        gzip: true
+    });
+
+    archive.pipe(output);
+
+    archive.directory(server_path + '\\world', false);
+    archive.finalize();
+
+    output.on('close', function () {
+        console.log('Done backing up');
+        status.innerHTML = 'Backup complete';
+        status.style.color = 'lightgreen';
+        disable_switch = false;
+        delay(2000).then(() => {
+            status.innerHTML = '';
+        });
+    });
+
+
+}
+
+function loadPlayerData(uuid) {
+    var ul = document.getElementById("player_list");
+
+    //remove all children
+    while (ul.firstChild) {
+        ul.removeChild(ul.firstChild);
+    }
+
+    //check if cache exists
+    var cache_path = './cache.json';
+    if (fs.existsSync(cache_path)) {
+        var cache = JSON.parse(fs.readFileSync(cache_path, 'utf8'));
+    } else {
+        var cache = {};
+    }
+
+    for (var i = 0; i < uuid.length; i++) {
+
+        (async () => {
+            var answer;
+
+            var id = uuid[i];
+
+            if (cache[id]) {
+                answer = cache[id];
+
+                if (answer == 'error') {
+                    return;
+                }
+
+            } else {
+
+                answer;
+                const res = await fetch('https://playerdb.co/api/player/minecraft/' + uuid[i]);
+                answer = await res.json();
+
+
+                if (!answer.success) {
+                    cache[id] = 'error';
+                    fs.writeFileSync(cache_path, JSON.stringify(cache, null, 4));
+                    return;
+                }
+
+                answer = answer.data.player;
+                cache[id] = answer;
+
+            }
+
+
+            fs.writeFileSync(cache_path, JSON.stringify(cache, null, 4));
+
+            var li = document.createElement("li");
+            var img = document.createElement("img");
+            var span = document.createElement("span");
+
+            li.style.listStyleType = "none";
+            span.innerHTML = answer.username;
+
+            img.style.width = "16px";
+            img.style.height = "16px";
+            img.style.marginRight = "5px";
+            img.src = answer.avatar;
+
+            li.appendChild(img);
+            li.appendChild(span);
+
+            ul.appendChild(li);
+
+        })();
+
+    }
 }

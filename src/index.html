@@ -34,9 +34,12 @@
     </div>
 
     <div id="server_screen" class="server_screen">
-      <h1 id="server_name" style="text-align: center;"></h1>
-      <h2 id="server_motd"></h2>
-      <h3 id="server_path"></h3>
+
+      <img src="" alt="" id="server_icon" style="float: left; margin-top: 30px; margin-right: 20px;">
+
+      <h1 id="server_name" style="margin-top: 20px; margin-bottom: 0px;"></h1>
+      <h3 id="server_motd" style="margin-top: 0px;"></h3>
+      <i><p id="server_path" class="smallinfo" style="margin-bottom: 10px; cursor: pointer;" onclick="openFolder();"></p></i>
 
       <div id="server_images">
       </div>
@@ -71,8 +74,21 @@
       <button onclick="startServer();">start server</button>
       <p style="font-size: 12px; margin-top: 0%;"><i>Options are saved when you start the server</i></p>
 
+
+      <hr>
+      <h2>World</h2>
+
+      <p id="world_name" class="info"></p>
+      <p id="world_size" class="info"></p>
+      <p id="player_data_count" title="The total amount of players that have joined this world" class="info"></p>
+      <button onclick="backupWorld();">backup world</button>
+      <p class="smallinfo">Please don't do stupid stuff while backup is in progress, it's your world after all</p>
+      <p id="backup_status" style="font-family: Consolas; background-color: black; width: 50%;"></p>
+
+
       <hr>
       <h2>Server properties</h2>
+      <button onclick="toggleDiv('server_properties');" style="float: right;">collapse</button>
 
       <button onclick="saveServerProperties();">save changes</button>
       <button onclick="resetChanges();">reset changes</button>
@@ -80,6 +96,15 @@
       <div id="server_properties">
         <ul id="server_properties" style="font-size: 2px;"></ul>
       </div>
+      <hr>
+      <h2>Player list</h2>
+      <button onclick="toggleDiv('player_list');" style="float: right;">collapse</button>
+      <div id="player_list">
+        <ul id="player_list" style="font-size: 2px;"></ul>
+      </div>
+      <i><p class="smallinfo">Illegitimate minecraft accounts will not show up</p></i>
+
+      <p class="smallinfo" style="text-align: center; margin-top: 150px; color: white;">Hello</p>
 
     </div>
 

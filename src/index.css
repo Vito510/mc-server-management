@@ -45,6 +45,12 @@ p.smallinfo {
   font-size: 12px;
 }
 
+p.info {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  font-size: 14px;
+}
+
 ul.serverlist {
   list-style-type: none;
   display: block;

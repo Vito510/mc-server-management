@@ -94,6 +94,8 @@ archive
 #test
 test
 change.txt
+temp.json
 
 #data
 server_list.json
+cache.json

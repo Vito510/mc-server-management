@@ -497,6 +497,8 @@ function showSettings() {
         return;
     }
 
+    active_server_id = -1;
+
     hideDiv('server_screen');
     showDiv('settings_screen');
 }

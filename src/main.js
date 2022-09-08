@@ -1,3 +1,4 @@
+const { table } = require('console');
 const fs = require('fs');
 const os = require('os');
 
@@ -21,9 +22,62 @@ const java_folder = config.java_folder_path
 document.getElementById("p_java_path").innerHTML = "Java folder: " + java_folder
 document.getElementById("p_java_count").innerHTML = "Total java versions found: " + fs.readdirSync(java_folder).length
 
+buildSettings()
+
 function saveConfig() {
     //save config to config.json
     fs.writeFileSync('config.json', JSON.stringify(config, null, 4));
+}
+
+function buildSettings() {
+    //Construct elements in settings
+    var table = document.getElementById("settings_table");
+    config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+
+    let ignore = ["search_path","java_folder_path"]
+
+    for (var key in config) {
+
+        if (ignore.includes(key)) {
+            continue;
+        }
+
+        tr = document.createElement("tr");
+        
+        th_name = document.createElement("th");
+        p = document.createElement("p");
+        p.innerHTML = key;
+        p.style.fontSize = "12px";
+        p.style.marginTop = 0;
+        p.style.marginBottom = 0;
+        p.style.marginRight = "100px";
+
+        th_name.appendChild(p);
+        tr.appendChild(th_name);
+
+        th_setting = document.createElement("th");
+        setting = document.createElement("input");
+        setting.type = "checkbox";
+        setting.checked = config[key];
+        setting.id = key;
+        setting.onclick = function () {
+            updateSettings(this.id, this.checked);
+        }
+
+        th_setting.appendChild(setting);
+        tr.appendChild(th_setting);
+        
+
+        table.appendChild(tr)
+
+    }
+
+
+}
+
+function updateSettings(key, property) {
+    config[key] = property;
+    saveConfig();
 }
 
 

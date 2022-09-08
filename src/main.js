@@ -617,7 +617,6 @@ function startServer() {
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
 
     var server_path = data[active_server_id].path;
-
     var server_data = JSON.parse(fs.readFileSync(server_path + '/server.json', 'utf8'));
 
     var ram_min = document.getElementById('Xms_value').value;
@@ -646,18 +645,31 @@ function startServer() {
     output += 'cd /d "' + server_path + '"\n';
     output += server_java + ' -Xmx' + ram_max + 'M -Xms' + ram_min + 'M -jar ' + server_jar + nogui + '\n';
 
+    console.log(output);
+
     fs.writeFileSync(server_path + '\\StartServer.bat', output);
-
-
 
     var child_process = require('child_process');
 
+    //handling for spaces in paths (for cmd)
+    server_path = server_path.split("\\");
+
+    for (let i = 0; i < server_path.length; i++) {
+        if (server_path[i].indexOf(" ") != -1) {
+            server_path[i] = '"'+server_path[i]+'"';
+        } 
+    }
+
+    server_path = server_path.join("/");
+
+
     var startpath = server_path + '/StartServer.bat';
+    console.log(startpath);
 
     if (config.useWindowsTerminal) {
-        child_process.exec("start wt.exe " + startpath);
+        child_process.exec('start wt.exe ' + startpath);
     } else {
-        child_process.exec("start " + startpath);
+        child_process.exec('start ' + startpath);
     }
 
 

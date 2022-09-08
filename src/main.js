@@ -439,7 +439,7 @@ function loadServer(server_id) {
 
 
     //properties
-    var ul = document.getElementById("server_properties");
+    var table = document.getElementById("server_properties");
 
     var dropdown_properties = {
         "gamemode": ["survival", "creative", "adventure", "spectator"],
@@ -447,24 +447,25 @@ function loadServer(server_id) {
     };
 
     //remove all children
-    while (ul.firstChild) {
-        ul.removeChild(ul.firstChild);
+    while (table.firstChild) {
+        table.removeChild(table.firstChild);
     }
 
     for (var key in data.properties) {
-        var li = document.createElement("li");
-        li.style.listStyleType = "none";
+        var tr = document.createElement("tr");
+        
+        var th_name = document.createElement("th");
+        var th_setting = document.createElement("th");
 
-
-        //li.innerHTML = key + ': ' + data.properties[key];
-        //ul.appendChild(li);
-
-
-        var span = document.createElement("span");
+        var p = document.createElement("p");
 
         //due to the defer of the json file, the css file is ignored        
-        span.innerHTML = key + ":";
-        span.style.fontSize = "15px";
+        p.innerHTML = key + ":";
+        p.style.fontSize = "12px";
+        p.style.marginTop = 0;
+        p.style.marginBottom = 0;
+        p.style.marginRight = "25px";
+
 
         //check if the property is a dropdown
         if (dropdown_properties[key] != undefined) {
@@ -478,7 +479,7 @@ function loadServer(server_id) {
                 select.appendChild(option);
             }
             select.value = data.properties[key];
-            span.appendChild(select);
+            th_setting.appendChild(select);
 
         } else if (typeof data.properties[key] == 'boolean') {
             //if property is a boolean, create a checkbox
@@ -488,13 +489,14 @@ function loadServer(server_id) {
             checkbox.setAttribute("onclick", "updateProperty(this.id, this.checked)");
             checkbox.checked = data.properties[key];
 
-            span.appendChild(checkbox);
+            th_setting.appendChild(checkbox);
         } else {
             var input = document.createElement("input");
             input.setAttribute("type", "text");
             input.setAttribute("id", key);
             input.setAttribute("value", data.properties[key]);
             input.setAttribute("onchange", "updateProperty(this.id, this.value)");
+            input.style.width = "300px";
 
             input.style.border = "none";
             input.style.borderStyle = "solid";
@@ -503,15 +505,16 @@ function loadServer(server_id) {
             input.style.fontSize = "15px";
 
 
-            span.appendChild(input);
+            th_setting.appendChild(input);
         }
 
-        li.style.padding = "0px";
-        li.style.marginTop = "0px";
+        th_name.appendChild(p)
+
+        tr.appendChild(th_name);
+        tr.appendChild(th_setting);
 
 
-        li.appendChild(span);
-        ul.appendChild(li);
+        table.append(tr);
 
     }
 

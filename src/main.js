@@ -3,7 +3,9 @@ const fs = require('fs');
 const os = require('os');
 
 
-const system_memory = os.totalmem() / 1024 / 1024;
+var system_memory = os.totalmem() / 1024 / 1024;
+system_memory = system_memory - system_memory % 1024;
+
 
 var active_server_id = -1;
 var temp_settings_data = {};
@@ -780,6 +782,10 @@ function loadPlayerData(uuid) {
 
     var table = document.getElementById("player_list");
 
+    for (var i = table.children.length - 1; i > 0; i--) {
+        table.removeChild(table.children[i]);
+    }
+
     var player_data = {};
 
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
@@ -855,6 +861,83 @@ function loadPlayerData(uuid) {
         }
     });
 
+    whitelist.forEach(item => {
+        id = item['uuid']
+        if (uuid.includes(id) && player_data.hasOwnProperty(id)) {
+            player_data[id]['whitelisted'] = true;
+        }
+    });
 
+    banned_players.forEach(item => {
+        id = item['uuid']
+        if (uuid.includes(id) && player_data.hasOwnProperty(id)) {
+            player_data[id]['banned'] = true;
+        }
+    });
+
+
+    
     console.log(player_data)
+
+    for(player in player_data) {
+
+        player = player_data[player]
+
+        tr = document.createElement("tr");
+
+        th_img = document.createElement("th");
+        img = document.createElement("img");
+
+        img.src = player['avatar'];
+        img.style.width = "16px";
+        img.style.height = "16px";
+
+        th_img.append(img);
+
+
+        th_name = document.createElement("th");
+        p = document.createElement("p");
+
+        p.style.fontSize = "12px";
+        p.style.marginBottom = 0;
+        p.style.marginTop = 0;
+
+        p.innerHTML = player['name'];
+        th_name.append(p);
+
+        tr.append(th_img);
+        tr.append(th_name);
+
+        a = ["op","whitelisted","banned"];
+
+        for(i = 0; i < 3; i++) {
+            th_check = document.createElement("th");
+            input = document.createElement("input");
+
+            input.type = "checkbox";
+            input.checked = player[a[i]];
+
+            th_check.append(input);
+            tr.append(th_check);
+        }
+
+        //add op level option if player is op
+        if (player["op"] > 0) {
+            select = document.createElement("select");
+            
+            for(i = 1; i <= 4; i++) {
+                option = document.createElement("option");
+                option.value = i;
+                option.innerHTML = i;
+                select.append(option);
+            }
+
+            select.value = player["op"];
+
+            tr.append(select);
+        }
+
+        table.append(tr);
+
+    }
 }

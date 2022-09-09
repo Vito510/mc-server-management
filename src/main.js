@@ -48,11 +48,11 @@ function buildSettings() {
         
         th_name = document.createElement("th");
         p = document.createElement("p");
+
+        p.classList.add("settings_options_text");
+
         p.innerHTML = key;
-        p.style.fontSize = "12px";
-        p.style.marginTop = 0;
-        p.style.marginBottom = 0;
-        p.style.marginRight = "100px";
+        
 
         th_name.appendChild(p);
         tr.appendChild(th_name);
@@ -203,7 +203,9 @@ function loadIntoBar() {
 
         button.setAttribute("id", data[key].id);
         button.setAttribute("onclick", "loadServer(this.id)");
-        button.style.width = "100%";
+        
+        button.classList.add("server_list");
+
         button.innerHTML = data[key].name;
 
         li.appendChild(button);
@@ -295,13 +297,14 @@ function loadServer(server_id) {
         images.forEach(item => {
             var img = document.createElement("img");
             img.src = item;
-            img.style.width = "30%";
-            img.style.paddingRight = "2%";
+
+            img.classList.add("server_images")
+
             //on click
             img.onclick = function () {
                 openImage(this.src);
             }
-            img.style.cursor = 'pointer';
+
             image_container.appendChild(img);
         });
     }
@@ -460,13 +463,10 @@ function loadServer(server_id) {
         var th_setting = document.createElement("th");
 
         var p = document.createElement("p");
-
-        //due to the defer of the json file, the css file is ignored        
+        
         p.innerHTML = key + ":";
-        p.style.fontSize = "12px";
-        p.style.marginTop = 0;
-        p.style.marginBottom = 0;
-        p.style.marginRight = "25px";
+        
+        p.classList.add("server_properties")
 
 
         //check if the property is a dropdown
@@ -498,14 +498,8 @@ function loadServer(server_id) {
             input.setAttribute("id", key);
             input.setAttribute("value", data.properties[key]);
             input.setAttribute("onchange", "updateProperty(this.id, this.value)");
-            input.style.width = "300px";
 
-            input.style.border = "none";
-            input.style.borderStyle = "solid";
-            input.style.borderWidth = "1px";
-            input.style.backgroundColor = "transparent";
-            input.style.fontSize = "15px";
-
+            input.classList.add("server_propreties")
 
             th_setting.appendChild(input);
         }
@@ -889,8 +883,7 @@ function loadPlayerData(uuid) {
         img = document.createElement("img");
 
         img.src = player['avatar'];
-        img.style.width = "16px";
-        img.style.height = "16px";
+        img.classList.add("player_info");
 
         th_img.append(img);
 
@@ -898,9 +891,7 @@ function loadPlayerData(uuid) {
         th_name = document.createElement("th");
         p = document.createElement("p");
 
-        p.style.fontSize = "12px";
-        p.style.marginBottom = 0;
-        p.style.marginTop = 0;
+        p.classList.add("player_info");
 
         p.innerHTML = player['name'];
         th_name.append(p);

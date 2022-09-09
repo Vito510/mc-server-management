@@ -7,8 +7,54 @@ body {
   margin: 0;
 }
 
+p.settings_options_text {
+  font-size: 12px;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-right: 100px;
+}
+
+button.server_list {
+  width: 100%;
+}
+
+img.server_images {
+  width: 30%;
+  padding-right: 2%;
+  cursor: pointer;
+}
+
+p.server_properties {
+  font-size: 12px;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-right: 25px;
+}
+
+input.server_properties {
+  width: 300px;
+  border: none;
+  border-style: solid;
+  border-width: 1px;
+  background-color: transparent;
+  font-size: 15px;
+}
+
+img.player_info {
+  width: 16px;
+  height: 16px;
+}
+
+p.player_info {
+  font-size: 12px;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+
 div.scrollmenu {
   overflow-y: auto;
+  overflow-x: hidden;
   float: left;
   height: 100%;
   width: 18%;

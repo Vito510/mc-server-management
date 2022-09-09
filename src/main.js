@@ -775,13 +775,19 @@ function backupWorld() {
 
 }
 
-function loadPlayerData(uuid) {
-    var ul = document.getElementById("player_list");
 
-    //remove all children
-    while (ul.firstChild) {
-        ul.removeChild(ul.firstChild);
-    }
+function loadPlayerData(uuid) {
+
+    var table = document.getElementById("player_list");
+
+    var player_data = {};
+
+    var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+    var server_path = data[active_server_id].path;
+
+    var ops = JSON.parse(fs.readFileSync(server_path+"/ops.json"))
+    var whitelist = JSON.parse(fs.readFileSync(server_path+"/whitelist.json"))
+    var banned_players = JSON.parse(fs.readFileSync(server_path+"/banned-players.json"))
 
     //check if cache exists
     var cache_path = './cache.json';
@@ -823,27 +829,32 @@ function loadPlayerData(uuid) {
 
             }
 
+            j = {
+                    "name": answer.username,
+                    "avatar": answer.avatar,
+                    "op": 0,
+                    "whitelisted": false,
+                    "banned": false
+                }
+
+            player_data[id] = j;
+
 
             fs.writeFileSync(cache_path, JSON.stringify(cache, null, 4));
 
-            var li = document.createElement("li");
-            var img = document.createElement("img");
-            var span = document.createElement("span");
-
-            li.style.listStyleType = "none";
-            span.innerHTML = answer.username;
-
-            img.style.width = "16px";
-            img.style.height = "16px";
-            img.style.marginRight = "5px";
-            img.src = answer.avatar;
-
-            li.appendChild(img);
-            li.appendChild(span);
-
-            ul.appendChild(li);
 
         })();
 
+
     }
+
+    ops.forEach(item => {
+        id = item['uuid']
+        if (uuid.includes(id) && player_data.hasOwnProperty(id)) {
+            player_data[id]['op'] = item['level']
+        }
+    });
+
+
+    console.log(player_data)
 }

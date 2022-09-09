@@ -7,12 +7,6 @@ body {
   margin: 0;
 }
 
-p.settings_options_text {
-  font-size: 12px;
-  margin-top: 0;
-  margin-bottom: 0;
-  margin-right: 100px;
-}
 
 button.server_list {
   width: 100%;
@@ -45,13 +39,6 @@ img.player_info {
   height: 16px;
 }
 
-p.player_info {
-  font-size: 12px;
-  margin-bottom: 0;
-  margin-top: 0;
-}
-
-
 div.scrollmenu {
   overflow-y: auto;
   overflow-x: hidden;
@@ -72,7 +59,7 @@ div.settings_screen {
   float: right;
   width: 80%;
   display: block;
-  background-color: white;
+  background-color: black;
   height: 100vh; /* 100vh is required for scrolling to work :) */
 }
 
@@ -81,7 +68,7 @@ div.server_screen {
   float: right;
   width: 80%;
   display: none;
-  background-color: white;
+  background-color: rgb(42,42,42);
   height: 100vh;
 }
 
@@ -97,6 +84,19 @@ p.info {
   font-size: 14px;
 }
 
+p.player_info {
+  font-size: 12px;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+p.settings_options_text {
+  font-size: 12px;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-right: 100px;
+}
+
 ul.serverlist {
   list-style-type: none;
   display: block;
@@ -110,4 +110,63 @@ ul#server_properties {
   padding: 0;
   margin: 0;
 }
+
+/* text */
+p, h1, h2, h3, h4, span {
+  color: white;
+}
+
+#server_path {
+  opacity: 70%;
+}
+
+/* background */
+body, div.server_screen, div.main, div.settings_screen,
+div.scrollmenu {
+  background-color: rgb(42,42,42);
+}
+
+/* button */
+button, input, select {
+  color: white;
+  background-color: rgb(42,42,42);
+  border-radius: 5px;
+}
+
+/* input[type="file"] {
+  display: none;
+} */
+
+input[type="range"] {
+  float: left;
+  -webkit-appearance: none;
+  margin-right: 15px;
+  width: 200px;
+  height: 7px;
+  background: rgba(42,42,42);
+  border: 1px solid gray;
+  border-radius: 5px;
+  background-image: linear-gradient(#0075ff, #0075ff);
+  background-size: 70% 100%;
+  background-repeat: no-repeat;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 15px;
+  width: 15px;
+  border-radius: 50%;
+  background: #0075ff;
+  cursor: ew-resize;
+  box-shadow: 0 0 2px 0 #555;
+  transition: background .3s ease-in-out;
+}
+
+input[type=range]::-webkit-slider-runnable-track  {
+  -webkit-appearance: none;
+  box-shadow: none;
+  border: none;
+  background: transparent;
+}
+
 

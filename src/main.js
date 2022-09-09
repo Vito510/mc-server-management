@@ -369,7 +369,7 @@ function loadServer(server_id) {
         Xmx_slider.value = startup_data.args.Xmx;
         Xmx_value.value = startup_data.args.Xmx;
 
-        Xms_value.value = startup_data.args.Xms;
+        Xms_slider.value = startup_data.args.Xms;
         Xms_value.value = startup_data.args.Xms;
 
         server_jar.value = startup_data.args.jar;
@@ -384,22 +384,33 @@ function loadServer(server_id) {
         server_jar.value = "Server jar filename";
     }
 
+    Xmx_slider.style.backgroundSize = (Xmx_slider.value - Xmx_slider.min) * 100 / (Xmx_slider.max - Xmx_slider.min) + '% 100%'
+    Xms_slider.style.backgroundSize = (Xms_slider.value - Xms_slider.min) * 100 / (Xms_slider.max - Xms_slider.min) + '% 100%'
+
+
 
 
     Xmx_slider.oninput = function () {
         Xmx_value.value = this.value;
+        this.style.backgroundSize = (this.value - this.min) * 100 / (this.max - this.min) + '% 100%'
+        
     }
 
     Xmx_value.oninput = function () {
         Xmx_slider.value = this.value;
+        Xmx_slider.style.backgroundSize = (this.value - this.min) * 100 / (this.max - this.min) + '% 100%'
     }
 
     Xms_slider.oninput = function () {
         Xms_value.value = this.value;
+        this.style.backgroundSize = (this.value - this.min) * 100 / (this.max - this.min) + '% 100%'
+
     }
 
     Xms_value.oninput = function () {
         Xms_slider.value = this.value;
+        Xms_slider.style.backgroundSize = (this.value - this.min) * 100 / (this.max - this.min) + '% 100%'
+
     }
 
     //server gui checkmark

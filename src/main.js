@@ -24,6 +24,21 @@ const java_folder = config.java_folder_path
 document.getElementById("p_java_path").innerHTML = "Java folder: " + java_folder
 document.getElementById("p_java_count").innerHTML = "Total java versions found: " + fs.readdirSync(java_folder).length
 
+alterCSS();
+
+function alterCSS() {
+
+    var r = document.querySelector(':root');
+    if (config["accentStartButton"]) {
+        r.style.setProperty('--celadon-green', '#36827f');
+        r.style.setProperty('--verdigris', '#52b7b3')
+    } else {
+        r.style.setProperty('--celadon-green', '#4a306dff');
+        r.style.setProperty('--verdigris', '#a167a5ff')
+    }
+
+}
+
 buildSettings()
 
 function saveConfig() {
@@ -219,6 +234,8 @@ function loadServer(server_id) {
     /**
     *load server details into main page
     **/
+
+    alterCSS();
 
     if (disable_switch || active_server_id == server_id) {
         return;
@@ -655,9 +672,8 @@ function startServer() {
     output += 'cd /d "' + server_path + '"\n';
     output += server_java + ' -Xmx' + ram_max + 'M -Xms' + ram_min + 'M -jar ' + server_jar + nogui + '\n';
 
-    console.log(output);
 
-    fs.writeFileSync(server_path + '\\StartServer.bat', output);
+    fs.writeFileSync(server_path + '\\StartServer.bat', output + "\nexit");
 
     var child_process = require('child_process');
 
@@ -701,8 +717,18 @@ function clearImages() {
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
     var server_data = JSON.parse(fs.readFileSync(data[active_server_id].path + '/server.json', 'utf8'));
     server_data.images = [];
+
+    var container = document.getElementById("server_images")
+
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+
     fs.writeFileSync(data[active_server_id].path + '/server.json', JSON.stringify(server_data, null, 4));
+
+
     loadServer(active_server_id);
+
 }
 
 function openFolder() {
@@ -881,8 +907,6 @@ function loadPlayerData(uuid) {
     });
 
 
-    
-    console.log(player_data)
 
     for(player in player_data) {
 

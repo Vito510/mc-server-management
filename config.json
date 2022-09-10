@@ -1,6 +1,8 @@
 {
     "search_path": "C:\\Users\\Vito\\Downloads",
     "java_folder_path": "C:\\Program Files\\Java",
-    "useWindowsTerminal": true,
-    "closeOnServerStart": false
+    "useWindowsTerminal": false,
+    "closeOnServerStart": false,
+    "closeConsoleOnServerStop": false,
+    "accentStartButton": true
 }

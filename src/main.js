@@ -24,6 +24,24 @@ const java_folder = config.java_folder_path
 document.getElementById("p_java_path").innerHTML = "Java folder: " + java_folder
 document.getElementById("p_java_count").innerHTML = "Total java versions found: " + fs.readdirSync(java_folder).length
 
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    var arrow = this.previousElementSibling;
+    if (content.style.maxHeight){
+      content.style.maxHeight = null;
+      arrow.style.transform = "rotate(180deg)";
+    } else {
+      content.style.maxHeight = content.scrollHeight + "px";
+    arrow.style.transform = "rotate(0deg)";
+    }
+  });
+}
+
 alterCSS();
 
 function alterCSS() {
@@ -725,7 +743,6 @@ function clearImages() {
     }
 
     fs.writeFileSync(data[active_server_id].path + '/server.json', JSON.stringify(server_data, null, 4));
-
 
     loadServer(active_server_id);
 

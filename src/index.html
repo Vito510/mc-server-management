@@ -91,7 +91,11 @@ viewBox="0 0 24 24"><path d="M 12 2 C 6.4889971 2 2 6.4889971 2 12 C 2 17.511003
 
 
       <hr>
-      <h2>World</h2>
+
+      <img src="../res/dropdown.svg" id="dropdown" class="dropdown">
+      <h2 onclick="" class="collapsible unselectable">World</h2>
+
+      <div class="content">
 
       <p id="world_name" class="info"></p>
       <p id="world_size" class="info"></p>
@@ -101,15 +105,21 @@ viewBox="0 0 24 24"><path d="M 12 2 C 6.4889971 2 2 6.4889971 2 12 C 2 17.511003
       <p id="backup_status" style="font-family: Consolas; background-color: black; width: 50%;"></p>
 
 
+      </div>
+
       <hr>
-      <h2>Server properties</h2>
-      <button onclick="toggleDiv('server_properties');" style="float: right;">collapse</button>
+      
+      <img src="../res/dropdown.svg" id="dropdown" class="dropdown">
+      <h2 onclick="" class="collapsible unselectable">Server properties</h2>
+      <div class="content">
 
-      <button onclick="saveServerProperties();">save changes</button>
-      <button onclick="resetChanges();">reset changes</button>
+        <button onclick="saveServerProperties();">save changes</button>
+        <button onclick="resetChanges();">reset changes</button>
 
-      <table id="server_properties" style="text-align: left; border-collapse:separate;">
-      </table>
+        <table id="server_properties" style="text-align: left; border-collapse:separate;">
+        </table>
+
+      </div>
 
       <hr>
       <h2>Player list</h2>
@@ -127,7 +137,7 @@ viewBox="0 0 24 24"><path d="M 12 2 C 6.4889971 2 2 6.4889971 2 12 C 2 17.511003
 
       <i><p class="smallinfo">Illegitimate minecraft accounts will not show up</p></i>
 
-      <p class="smallinfo" style="text-align: center; margin-top: 150px; color: white;">Hello</p>
+      <p class="smallinfo" id="cheat">Hello</p>
 
     </div>
 

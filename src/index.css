@@ -129,6 +129,12 @@ p, h1, h2, h3, h4, span {
   color: white;
 }
 
+p#cheat {
+  text-align: center;
+  margin-top: 150px;
+  color: transparent;
+}
+
 #server_path {
   opacity: 70%;
 }
@@ -208,6 +214,41 @@ input[type=checkbox] {
   background-color: var(--pale-purple-pantone);
   color: black;
 }
+
+.collapsible {
+  cursor: pointer;
+}
+
+
+.content {
+  padding: 0 18px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
+
+
+.unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+img.dropdown {
+  width: 48px;
+  height: 48px;
+  margin: -10px;
+  margin-top: 6px;
+  margin-right: 0px;
+  float: left;
+  transform: rotate(180deg);
+  transition: 0.2s;
+}
+
+
 
 
 

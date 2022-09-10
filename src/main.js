@@ -3,7 +3,9 @@ const fs = require('fs');
 const os = require('os');
 
 
-const system_memory = os.totalmem() / 1024 / 1024;
+var system_memory = os.totalmem() / 1024 / 1024;
+system_memory = system_memory - system_memory % 1024;
+
 
 var active_server_id = -1;
 var temp_settings_data = {};
@@ -21,6 +23,39 @@ const java_folder = config.java_folder_path
 
 document.getElementById("p_java_path").innerHTML = "Java folder: " + java_folder
 document.getElementById("p_java_count").innerHTML = "Total java versions found: " + fs.readdirSync(java_folder).length
+
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    var arrow = this.previousElementSibling;
+    if (content.style.maxHeight){
+      content.style.maxHeight = null;
+      arrow.style.transform = "rotate(180deg)";
+    } else {
+      content.style.maxHeight = content.scrollHeight + "px";
+    arrow.style.transform = "rotate(0deg)";
+    }
+  });
+}
+
+alterCSS();
+
+function alterCSS() {
+
+    var r = document.querySelector(':root');
+    if (config["accentStartButton"]) {
+        r.style.setProperty('--celadon-green', '#36827f');
+        r.style.setProperty('--verdigris', '#52b7b3')
+    } else {
+        r.style.setProperty('--celadon-green', '#4a306dff');
+        r.style.setProperty('--verdigris', '#a167a5ff')
+    }
+
+}
 
 buildSettings()
 
@@ -46,11 +81,11 @@ function buildSettings() {
         
         th_name = document.createElement("th");
         p = document.createElement("p");
+
+        p.classList.add("settings_options_text");
+
         p.innerHTML = key;
-        p.style.fontSize = "12px";
-        p.style.marginTop = 0;
-        p.style.marginBottom = 0;
-        p.style.marginRight = "100px";
+        
 
         th_name.appendChild(p);
         tr.appendChild(th_name);
@@ -201,7 +236,9 @@ function loadIntoBar() {
 
         button.setAttribute("id", data[key].id);
         button.setAttribute("onclick", "loadServer(this.id)");
-        button.style.width = "100%";
+        
+        button.classList.add("server_list");
+
         button.innerHTML = data[key].name;
 
         li.appendChild(button);
@@ -215,6 +252,8 @@ function loadServer(server_id) {
     /**
     *load server details into main page
     **/
+
+    alterCSS();
 
     if (disable_switch || active_server_id == server_id) {
         return;
@@ -293,13 +332,14 @@ function loadServer(server_id) {
         images.forEach(item => {
             var img = document.createElement("img");
             img.src = item;
-            img.style.width = "30%";
-            img.style.paddingRight = "2%";
+
+            img.classList.add("server_images")
+
             //on click
             img.onclick = function () {
                 openImage(this.src);
             }
-            img.style.cursor = 'pointer';
+
             image_container.appendChild(img);
         });
     }
@@ -364,7 +404,7 @@ function loadServer(server_id) {
         Xmx_slider.value = startup_data.args.Xmx;
         Xmx_value.value = startup_data.args.Xmx;
 
-        Xms_value.value = startup_data.args.Xms;
+        Xms_slider.value = startup_data.args.Xms;
         Xms_value.value = startup_data.args.Xms;
 
         server_jar.value = startup_data.args.jar;
@@ -379,22 +419,33 @@ function loadServer(server_id) {
         server_jar.value = "Server jar filename";
     }
 
+    Xmx_slider.style.backgroundSize = (Xmx_slider.value - Xmx_slider.min) * 100 / (Xmx_slider.max - Xmx_slider.min) + '% 100%'
+    Xms_slider.style.backgroundSize = (Xms_slider.value - Xms_slider.min) * 100 / (Xms_slider.max - Xms_slider.min) + '% 100%'
+
+
 
 
     Xmx_slider.oninput = function () {
         Xmx_value.value = this.value;
+        this.style.backgroundSize = (this.value - this.min) * 100 / (this.max - this.min) + '% 100%'
+        
     }
 
     Xmx_value.oninput = function () {
         Xmx_slider.value = this.value;
+        Xmx_slider.style.backgroundSize = (this.value - this.min) * 100 / (this.max - this.min) + '% 100%'
     }
 
     Xms_slider.oninput = function () {
         Xms_value.value = this.value;
+        this.style.backgroundSize = (this.value - this.min) * 100 / (this.max - this.min) + '% 100%'
+
     }
 
     Xms_value.oninput = function () {
         Xms_slider.value = this.value;
+        Xms_slider.style.backgroundSize = (this.value - this.min) * 100 / (this.max - this.min) + '% 100%'
+
     }
 
     //server gui checkmark
@@ -458,13 +509,10 @@ function loadServer(server_id) {
         var th_setting = document.createElement("th");
 
         var p = document.createElement("p");
-
-        //due to the defer of the json file, the css file is ignored        
+        
         p.innerHTML = key + ":";
-        p.style.fontSize = "12px";
-        p.style.marginTop = 0;
-        p.style.marginBottom = 0;
-        p.style.marginRight = "25px";
+        
+        p.classList.add("server_properties")
 
 
         //check if the property is a dropdown
@@ -496,14 +544,8 @@ function loadServer(server_id) {
             input.setAttribute("id", key);
             input.setAttribute("value", data.properties[key]);
             input.setAttribute("onchange", "updateProperty(this.id, this.value)");
-            input.style.width = "300px";
 
-            input.style.border = "none";
-            input.style.borderStyle = "solid";
-            input.style.borderWidth = "1px";
-            input.style.backgroundColor = "transparent";
-            input.style.fontSize = "15px";
-
+            input.classList.add("server_propreties")
 
             th_setting.appendChild(input);
         }
@@ -648,9 +690,8 @@ function startServer() {
     output += 'cd /d "' + server_path + '"\n';
     output += server_java + ' -Xmx' + ram_max + 'M -Xms' + ram_min + 'M -jar ' + server_jar + nogui + '\n';
 
-    console.log(output);
 
-    fs.writeFileSync(server_path + '\\StartServer.bat', output);
+    fs.writeFileSync(server_path + '\\StartServer.bat', output + "\nexit");
 
     var child_process = require('child_process');
 
@@ -694,8 +735,17 @@ function clearImages() {
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
     var server_data = JSON.parse(fs.readFileSync(data[active_server_id].path + '/server.json', 'utf8'));
     server_data.images = [];
+
+    var container = document.getElementById("server_images")
+
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+
     fs.writeFileSync(data[active_server_id].path + '/server.json', JSON.stringify(server_data, null, 4));
+
     loadServer(active_server_id);
+
 }
 
 function openFolder() {
@@ -775,13 +825,23 @@ function backupWorld() {
 
 }
 
-function loadPlayerData(uuid) {
-    var ul = document.getElementById("player_list");
 
-    //remove all children
-    while (ul.firstChild) {
-        ul.removeChild(ul.firstChild);
+function loadPlayerData(uuid) {
+
+    var table = document.getElementById("player_list");
+
+    for (var i = table.children.length - 1; i > 0; i--) {
+        table.removeChild(table.children[i]);
     }
+
+    var player_data = {};
+
+    var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+    var server_path = data[active_server_id].path;
+
+    var ops = JSON.parse(fs.readFileSync(server_path+"/ops.json"))
+    var whitelist = JSON.parse(fs.readFileSync(server_path+"/whitelist.json"))
+    var banned_players = JSON.parse(fs.readFileSync(server_path+"/banned-players.json"))
 
     //check if cache exists
     var cache_path = './cache.json';
@@ -823,27 +883,104 @@ function loadPlayerData(uuid) {
 
             }
 
+            j = {
+                    "name": answer.username,
+                    "avatar": answer.avatar,
+                    "op": 0,
+                    "whitelisted": false,
+                    "banned": false
+                }
+
+            player_data[id] = j;
+
 
             fs.writeFileSync(cache_path, JSON.stringify(cache, null, 4));
 
-            var li = document.createElement("li");
-            var img = document.createElement("img");
-            var span = document.createElement("span");
-
-            li.style.listStyleType = "none";
-            span.innerHTML = answer.username;
-
-            img.style.width = "16px";
-            img.style.height = "16px";
-            img.style.marginRight = "5px";
-            img.src = answer.avatar;
-
-            li.appendChild(img);
-            li.appendChild(span);
-
-            ul.appendChild(li);
 
         })();
+
+
+    }
+
+    ops.forEach(item => {
+        id = item['uuid']
+        if (uuid.includes(id) && player_data.hasOwnProperty(id)) {
+            player_data[id]['op'] = item['level']
+        }
+    });
+
+    whitelist.forEach(item => {
+        id = item['uuid']
+        if (uuid.includes(id) && player_data.hasOwnProperty(id)) {
+            player_data[id]['whitelisted'] = true;
+        }
+    });
+
+    banned_players.forEach(item => {
+        id = item['uuid']
+        if (uuid.includes(id) && player_data.hasOwnProperty(id)) {
+            player_data[id]['banned'] = true;
+        }
+    });
+
+
+
+    for(player in player_data) {
+
+        player = player_data[player]
+
+        tr = document.createElement("tr");
+
+        th_img = document.createElement("th");
+        img = document.createElement("img");
+
+        img.src = player['avatar'];
+        img.classList.add("player_info");
+
+        th_img.append(img);
+
+
+        th_name = document.createElement("th");
+        p = document.createElement("p");
+
+        p.classList.add("player_info");
+
+        p.innerHTML = player['name'];
+        th_name.append(p);
+
+        tr.append(th_img);
+        tr.append(th_name);
+
+        a = ["op","whitelisted","banned"];
+
+        for(i = 0; i < 3; i++) {
+            th_check = document.createElement("th");
+            input = document.createElement("input");
+
+            input.type = "checkbox";
+            input.checked = player[a[i]];
+
+            th_check.append(input);
+            tr.append(th_check);
+        }
+
+        //add op level option if player is op
+        if (player["op"] > 0) {
+            select = document.createElement("select");
+            
+            for(i = 1; i <= 4; i++) {
+                option = document.createElement("option");
+                option.value = i;
+                option.innerHTML = i;
+                select.append(option);
+            }
+
+            select.value = player["op"];
+
+            tr.append(select);
+        }
+
+        table.append(tr);
 
     }
 }

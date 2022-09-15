@@ -623,6 +623,7 @@ function changeServerIcon(id) {
 
         // image.setVideoSize("64x64");
         image.addCommand("-vf scale=64:64")
+        image.addCommand("-y")
         image.save(out+"\\server-icon.png")
     });
 

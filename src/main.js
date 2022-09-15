@@ -605,6 +605,31 @@ function openDownloadPage(s, id) {
     x.value = "";
 }
 
+function changeServerIcon(id) {
+    path = document.getElementById(id).files[0].path;
+
+    var ffmpeg = require('ffmpeg');
+    var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+
+    out = data[active_server_id].path
+    out = out.replace("/","\\")
+
+    console.log(out)
+
+    var process = new ffmpeg(path);
+
+    process.then(function (image) {
+
+
+        // image.setVideoSize("64x64");
+        image.addCommand("-vf scale=64:64")
+        image.save(out+"\\server-icon.png")
+    });
+
+    console.log(path)
+
+}
+
 
 function showSettings() {
 

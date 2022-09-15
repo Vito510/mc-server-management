@@ -476,6 +476,8 @@ function loadServer(server_id) {
     var playerdata_files = 0;
     var player_uuid = [];
 
+    console.log(data.properties)
+
     fs.readdirSync(data.path + '\\' + data.properties['level-name'] + '\\playerdata').forEach(element => {
         if (element.endsWith('.dat')) {
             playerdata_files++;
@@ -587,6 +589,46 @@ function toggleDiv(div_id) {
     } else {
         x.style.display = "none";
     }
+}
+
+function openDownloadPage(s, id) {
+
+    if (s == "") {
+        return;
+    }
+
+    var child_process = require('child_process');
+    base_url = "https://mcversions.net/download/"
+    child_process.exec("start "+base_url+s)
+
+    x = document.getElementById(id);
+    x.value = "";
+}
+
+function changeServerIcon(id) {
+    path = document.getElementById(id).files[0].path;
+
+    var ffmpeg = require('ffmpeg');
+    var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+
+    out = data[active_server_id].path
+    out = out.replace("/","\\")
+
+    console.log(out)
+
+    var process = new ffmpeg(path);
+
+    process.then(function (image) {
+
+
+        // image.setVideoSize("64x64");
+        image.addCommand("-vf scale=64:64")
+        image.addCommand("-y")
+        image.save(out+"\\server-icon.png")
+    });
+
+    console.log(path)
+
 }
 
 

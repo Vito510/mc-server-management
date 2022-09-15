@@ -31,6 +31,14 @@ img.server_images {
   cursor: pointer;
 }
 
+img#server_icon {
+  transition: 0.5s;
+}
+
+img#server_icon:hover {
+  opacity: 50%;
+}
+
 p.server_properties {
   font-size: 12px;
   margin-top: 0;

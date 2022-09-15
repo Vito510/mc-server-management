@@ -306,7 +306,7 @@ function loadServer(server_id) {
         //save images to server.json
         startup_data.images = images;
         fs.writeFileSync(data.path + '/server.json', JSON.stringify(startup_data, null, 4));
-        loadServer(active_server_id);
+
     }
 
     if (startup_data.images != undefined) {

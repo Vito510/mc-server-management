@@ -34,11 +34,17 @@
       <table id="settings_table" style="text-align: left; border-collapse:separate;">
       </table>
 
+      <hr>
+
+      <p style="margin-bottom: 0%;">Open server jar download page</p>
+      <input type="text" name="" id="server_jar_search" placeholder="Version (1.8.9)" onchange="openDownloadPage(this.value, this.id);">
+
+
     </div>
 
     <div id="server_screen" class="server_screen">
 
-      <img src="" alt="" id="server_icon" style="float: left; margin-top: 30px; margin-right: 20px; width: 64px; height: 64px;">
+      <img src="" alt="" id="server_icon" style="float: left; margin-top: 30px; margin-right: 20px; width: 64px; height: 64px;" onclick="changeServerIcon();">
 
       <h1 id="server_name" style="margin-top: 20px; margin-bottom: 0px;"></h1>
       <h3 id="server_motd" style="margin-top: 0px;"></h3>

@@ -476,6 +476,8 @@ function loadServer(server_id) {
     var playerdata_files = 0;
     var player_uuid = [];
 
+    console.log(data.properties)
+
     fs.readdirSync(data.path + '\\' + data.properties['level-name'] + '\\playerdata').forEach(element => {
         if (element.endsWith('.dat')) {
             playerdata_files++;
@@ -587,6 +589,20 @@ function toggleDiv(div_id) {
     } else {
         x.style.display = "none";
     }
+}
+
+function openDownloadPage(s, id) {
+
+    if (s == "") {
+        return;
+    }
+
+    var child_process = require('child_process');
+    base_url = "https://mcversions.net/download/"
+    child_process.exec("start "+base_url+s)
+
+    x = document.getElementById(id);
+    x.value = "";
 }
 
 

@@ -255,7 +255,7 @@ function loadServer(server_id) {
 
     alterCSS();
 
-    if (disable_switch || active_server_id == server_id) {
+    if (disable_switch) {
         return;
     }
 
@@ -274,7 +274,7 @@ function loadServer(server_id) {
 
     //check if server-icon exists
     if (fs.existsSync(data.path + '/server-icon.png')) {
-        document.getElementById("server_icon").src = data.path + '/server-icon.png';
+        document.getElementById("server_icon").src = data.path + '/server-icon.png?t=' + new Date().getTime();
         document.getElementById("server_icon").title = '';
     } else {
         document.getElementById("server_icon").src = 'https://via.placeholder.com/64';
@@ -608,13 +608,22 @@ function openDownloadPage(s, id) {
 function changeServerIcon(id) {
     path = document.getElementById(id).files[0].path;
 
+    path = path.split("\\");
+
+    for (let i = 0; i < path.length; i++) {
+        if (path[i].indexOf(" ") != -1) {
+            path[i] = '"'+path[i]+'"';
+        } 
+    }
+
+    path = path.join("/");
+
     var ffmpeg = require('ffmpeg');
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
 
     out = data[active_server_id].path
     out = out.replace("/","\\")
 
-    console.log(out)
 
     var process = new ffmpeg(path);
 
@@ -624,10 +633,12 @@ function changeServerIcon(id) {
         // image.setVideoSize("64x64");
         image.addCommand("-vf scale=64:64")
         image.addCommand("-y")
-        image.save(out+"\\server-icon.png")
+        image.save('"'+out+'\\server-icon.png"')
     });
 
-    console.log(path)
+    data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+
+    document.getElementById("server_icon").src = path;
 
 }
 

@@ -259,6 +259,12 @@ function loadServer(server_id) {
         return;
     }
 
+    if (config["instantlySaveServerProperties"]) {
+        showDiv("save_properties_button")
+    } else {
+        hideDiv("save_properties_button")
+    }
+
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
     var startup_data = JSON.parse(fs.readFileSync(data[server_id].path + '/server.json', 'utf8'));
 
@@ -658,6 +664,9 @@ function showSettings() {
 function updateProperty(property, value) {
     //update property in server_list.json
     temp_settings_data[active_server_id]['properties'][property] = value;
+    if (config["instantlySaveServerProperties"] == false) {
+        saveServerProperties();
+    }
 
 }
 

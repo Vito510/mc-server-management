@@ -4,5 +4,6 @@
     "useWindowsTerminal": false,
     "closeOnServerStart": false,
     "closeConsoleOnServerStop": false,
-    "accentStartButton": true
+    "accentStartButton": true,
+    "instantlySaveServerProperties": false
 }

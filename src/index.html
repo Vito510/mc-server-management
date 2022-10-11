@@ -34,11 +34,20 @@
       <table id="settings_table" style="text-align: left; border-collapse:separate;">
       </table>
 
+      <hr>
+
+      <p style="margin-bottom: 0%;">Open vanilla server jar download page</p>
+      <input type="text" name="" id="server_jar_search" placeholder="Version (1.8.9)" onchange="openDownloadPage(this.value, this.id);">
+
+
     </div>
 
     <div id="server_screen" class="server_screen">
 
+      <label for="input_server_icon" style="position: relative;">
       <img src="" alt="" id="server_icon" style="float: left; margin-top: 30px; margin-right: 20px; width: 64px; height: 64px;">
+      </label>
+      <input type="file" name="" id="input_server_icon" onchange="changeServerIcon(this.id)">
 
       <h1 id="server_name" style="margin-top: 20px; margin-bottom: 0px;"></h1>
       <h3 id="server_motd" style="margin-top: 0px;"></h3>
@@ -47,14 +56,14 @@
       <div id="server_images">
       </div>
 
-      <label for="input_server_images">
+      <label for="input_server_images" onchange="loadServer();">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48"><path fill="none" d="M0 0h24v24H0z"/><path d="M21 15v3h3v2h-3v3h-2v-3h-3v-2h3v-3h2zm.008-12c.548 0 .992.445.992.993V13h-2V5H4v13.999L14 9l3 3v2.829l-3-3L6.827 19H14v2H2.992A.993.993 0 0 1 2 20.007V3.993A1 1 0 0 1 2.992 3h18.016zM8 7a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/></svg>
       </label>
 
       <br>
 
+      <input type="file" name="" id="input_server_images" onchange="loadServer(active_server_id);" multiple>
 
-      <input type="file" name="" id="input_server_images" multiple>
       <button onclick="clearImages();">clear images</button>
 
       <hr>
@@ -108,9 +117,10 @@
       <svg class="dropdown" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 15l-4.243-4.243 1.415-1.414L12 12.172l2.828-2.829 1.415 1.414z"/></svg>
       <h2 onclick="" class="collapsible unselectable">Server properties</h2>
       <div class="content">
-
+        <div id="save_properties_button">
         <button onclick="saveServerProperties();">save changes</button>
         <button onclick="resetChanges();">reset changes</button>
+        </div>
 
         <table id="server_properties" style="text-align: left; border-collapse:separate;">
         </table>

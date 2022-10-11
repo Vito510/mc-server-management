@@ -255,8 +255,14 @@ function loadServer(server_id) {
 
     alterCSS();
 
-    if (disable_switch || active_server_id == server_id) {
+    if (disable_switch) {
         return;
+    }
+
+    if (config["instantlySaveServerProperties"]) {
+        showDiv("save_properties_button")
+    } else {
+        hideDiv("save_properties_button")
     }
 
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
@@ -274,7 +280,7 @@ function loadServer(server_id) {
 
     //check if server-icon exists
     if (fs.existsSync(data.path + '/server-icon.png')) {
-        document.getElementById("server_icon").src = data.path + '/server-icon.png';
+        document.getElementById("server_icon").src = data.path + '/server-icon.png?t=' + new Date().getTime();
         document.getElementById("server_icon").title = '';
     } else {
         document.getElementById("server_icon").src = 'https://via.placeholder.com/64';
@@ -306,7 +312,7 @@ function loadServer(server_id) {
         //save images to server.json
         startup_data.images = images;
         fs.writeFileSync(data.path + '/server.json', JSON.stringify(startup_data, null, 4));
-        loadServer(active_server_id);
+
     }
 
     if (startup_data.images != undefined) {
@@ -476,6 +482,8 @@ function loadServer(server_id) {
     var playerdata_files = 0;
     var player_uuid = [];
 
+    console.log(data.properties)
+
     fs.readdirSync(data.path + '\\' + data.properties['level-name'] + '\\playerdata').forEach(element => {
         if (element.endsWith('.dat')) {
             playerdata_files++;
@@ -589,6 +597,57 @@ function toggleDiv(div_id) {
     }
 }
 
+function openDownloadPage(s, id) {
+
+    if (s == "") {
+        return;
+    }
+
+    var child_process = require('child_process');
+    base_url = "https://mcversions.net/download/"
+    child_process.exec("start "+base_url+s)
+
+    x = document.getElementById(id);
+    x.value = "";
+}
+
+function changeServerIcon(id) {
+    path = document.getElementById(id).files[0].path;
+
+    path = path.split("\\");
+
+    for (let i = 0; i < path.length; i++) {
+        if (path[i].indexOf(" ") != -1) {
+            path[i] = '"'+path[i]+'"';
+        } 
+    }
+
+    path = path.join("/");
+
+    var ffmpeg = require('ffmpeg');
+    var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+
+    out = data[active_server_id].path
+    out = out.replace("/","\\")
+
+
+    var process = new ffmpeg(path);
+
+    process.then(function (image) {
+
+
+        // image.setVideoSize("64x64");
+        image.addCommand("-vf scale=64:64")
+        image.addCommand("-y")
+        image.save('"'+out+'\\server-icon.png"')
+    });
+
+    data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
+
+    document.getElementById("server_icon").src = path;
+
+}
+
 
 function showSettings() {
 
@@ -605,6 +664,9 @@ function showSettings() {
 function updateProperty(property, value) {
     //update property in server_list.json
     temp_settings_data[active_server_id]['properties'][property] = value;
+    if (config["instantlySaveServerProperties"] == false) {
+        saveServerProperties();
+    }
 
 }
 

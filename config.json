@@ -5,5 +5,5 @@
     "closeOnServerStart": false,
     "closeConsoleOnServerStop": false,
     "accentStartButton": true,
-    "instantlySaveServerProperties": false
+    "instantlySaveServerProperties": true
 }

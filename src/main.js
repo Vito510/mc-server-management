@@ -12,6 +12,8 @@ var temp_settings_data = {};
 
 var disable_switch = false;
 
+var player_data = {};
+
 
 //startup
 loadIntoBar();
@@ -260,9 +262,9 @@ function loadServer(server_id) {
     }
 
     if (config["instantlySaveServerProperties"]) {
-        showDiv("save_properties_button")
-    } else {
         hideDiv("save_properties_button")
+    } else {
+        showDiv("save_properties_button")
     }
 
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
@@ -482,7 +484,6 @@ function loadServer(server_id) {
     var playerdata_files = 0;
     var player_uuid = [];
 
-    console.log(data.properties)
 
     fs.readdirSync(data.path + '\\' + data.properties['level-name'] + '\\playerdata').forEach(element => {
         if (element.endsWith('.dat')) {
@@ -574,6 +575,8 @@ function loadServer(server_id) {
 
     hideDiv('settings_screen');
     showDiv('server_screen');
+
+    
 
 
 }
@@ -888,6 +891,7 @@ function backupWorld() {
 }
 
 
+
 function loadPlayerData(uuid) {
 
     var table = document.getElementById("player_list");
@@ -896,7 +900,7 @@ function loadPlayerData(uuid) {
         table.removeChild(table.children[i]);
     }
 
-    var player_data = {};
+    player_data = {};
 
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
     var server_path = data[active_server_id].path;
@@ -989,6 +993,7 @@ function loadPlayerData(uuid) {
 
     for(player in player_data) {
 
+        uuid = player
         player = player_data[player]
 
         tr = document.createElement("tr");
@@ -1013,36 +1018,116 @@ function loadPlayerData(uuid) {
         tr.append(th_img);
         tr.append(th_name);
 
-        a = ["op","whitelisted","banned"];
+        //add op level
+        select = document.createElement("select");
+        
+        for(i = 0; i <= 4; i++) {
+            option = document.createElement("option");
+            option.value = i;
+            option.innerHTML = i;
+            select.append(option);
 
-        for(i = 0; i < 3; i++) {
+        }
+
+        select.value = player["op"];
+        select.id = uuid
+        select.setAttribute("onchange", 'updatePlayerData(this.id,"op",parseInt(this.value))');
+
+
+        tr.append(select);
+
+        table.append(tr);
+
+        a = ["whitelisted","banned"];
+
+        for(i = 0; i < 2; i++) {
             th_check = document.createElement("th");
             input = document.createElement("input");
 
             input.type = "checkbox";
             input.checked = player[a[i]];
+            input.id = uuid+"//"+a[i];
+
+            input.setAttribute("onchange", 'updatePlayerData(this.id.split("//")[0],this.id.split("//")[1], this.checked)');
+
 
             th_check.append(input);
             tr.append(th_check);
         }
 
-        //add op level option if player is op
-        if (player["op"] > 0) {
-            select = document.createElement("select");
-            
-            for(i = 1; i <= 4; i++) {
-                option = document.createElement("option");
-                option.value = i;
-                option.innerHTML = i;
-                select.append(option);
-            }
-
-            select.value = player["op"];
-
-            tr.append(select);
-        }
-
-        table.append(tr);
 
     }
+
+}
+
+function getDateTime() {
+    var date_ob = new Date();
+    var day = ("0" + date_ob.getDate()).slice(-2);
+    var month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+    var year = date_ob.getFullYear();
+        
+    var hours = date_ob.getHours();
+    var minutes = date_ob.getMinutes();
+    var seconds = date_ob.getSeconds();
+    
+    var dateTime = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
+    return dateTime;
+}
+
+function updatePlayerData(uuid, key, value) {
+    //update local player data properties
+    player_data[uuid][key] = value;
+    SavePlayerData();
+}
+
+function SavePlayerData() {
+    ops = []
+    whitelist = []
+    banned = []
+
+    for (const key in player_data) {
+        if (Object.hasOwnProperty.call(player_data, key)) {
+            const player = player_data[key];
+            if (player["op"] > 0) {
+                ops.push({
+                    "uuid": key,
+                    "name": player["name"],
+                    "level": player["op"],
+                    "bypassesPlayerLimit": false
+                })
+            }
+
+            if (player["banned"] == true) {
+                banned.push({
+                    "uuid": key,
+                    "name": player["name"],
+                    "created": getDateTime(),
+                    "source": "mc-server-management",
+                    "expires": "forever",
+                    "reason": "Banned by an operator."
+                })
+            }
+
+            if (player["whitelisted"] == true) {
+                whitelist.push({
+                    "uuid": key,
+                    "name": player["name"]
+                })
+            }
+        }
+    }
+
+    //write
+
+    var server_path = JSON.parse(fs.readFileSync('server_list.json', 'utf8'))[active_server_id].path;
+
+    fs.writeFileSync(server_path+"/ops.json", JSON.stringify(ops, null, 4));
+    fs.writeFileSync(server_path+"/banned-players.json", JSON.stringify(banned, null, 4));
+    fs.writeFileSync(server_path+"/whitelist.json", JSON.stringify(whitelist, null, 4));
+
+
+
+
+    console.log(ops)
+
 }

@@ -15,6 +15,7 @@ var disable_switch = false;
 var player_data = {};
 
 
+
 //startup
 loadIntoBar();
 
@@ -593,6 +594,7 @@ function hideDiv(div_id) {
 
 function toggleDiv(div_id) {
     var x = document.getElementById(div_id);
+    
     if (x.style.display == "none") {
         x.style.display = "block";
     } else {
@@ -1020,11 +1022,13 @@ function loadPlayerData(uuid) {
 
         //add op level
         select = document.createElement("select");
+        info = ["Player is not op.","Player can bypass spawn protection.","Player can use cheat commands and command blocks.","Player can use multiplayer management commands.","Player can use all commands including server management commands"]
         
         for(i = 0; i <= 4; i++) {
             option = document.createElement("option");
             option.value = i;
             option.innerHTML = i;
+            option.title = info[i];
             select.append(option);
 
         }

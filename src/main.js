@@ -500,6 +500,8 @@ function loadServer(server_id) {
 
 
     //properties
+    document.getElementById("properties_search").value = "";
+    propertiesSearch("");
     var table = document.getElementById("server_properties");
 
     var dropdown_properties = {
@@ -1082,6 +1084,23 @@ function updatePlayerData(uuid, key, value) {
     //update local player data properties
     player_data[uuid][key] = value;
     SavePlayerData();
+}
+
+function propertiesSearch(search) {
+    //hide elements that do not contain search
+    children = document.getElementById("server_properties").children;
+
+    for (let index = 0; index < children.length; index++) {
+        const element = children[index];
+        const text = element.firstChild.firstChild.innerHTML;
+        
+        if (text.search(search) == -1) {
+            element.style.display = "none";
+        } else {
+            element.style.display = "";
+        }
+        
+    }
 }
 
 function SavePlayerData() {

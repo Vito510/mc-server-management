@@ -175,6 +175,21 @@ button.start_server_button {
 hr {
   color: var(--pearly-purple);
   border-color: var(--pearly-purple);
+  outline: none;
+}
+
+input#properties_search {
+  background-color: transparent;
+  border: none;
+  border-bottom: solid var(--pearly-purple) 1px; 
+  border-radius: 0%;
+}
+
+input#properties_search:focus {
+  border: none;
+  outline: none;
+  border-bottom: solid var(--pearly-purple) 1px; 
+  border-radius: 0%;
 }
 
 input[type="file"] {

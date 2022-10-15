@@ -10,9 +10,9 @@
 
 <body>
 
-  <div class="scrollmenu">
+  <div class="scrollmenu" id="scrollmenu">
     <ul id="serverlist" class="serverlist">
-      <button style="width: 100%;" onclick="showSettings();">Settings</button>
+      <button id="show-settings-button" style="width: 64px;" onclick="showSettings();">Settings</button>
     </ul>
   </div>
 
@@ -33,6 +33,8 @@
 
       <table id="settings_table" style="text-align: left; border-collapse:separate;">
       </table>
+
+      <select name="theme_select" id="theme_select" onchange="loadTheme(this.value)"></select>
 
       <hr>
 
@@ -91,7 +93,7 @@
       <br>
 
 
-      <button class="start_server_button" onclick="startServer();">start server</button>
+      <button id="start_server_button" class="start_server_button" onclick="startServer();">start server</button>
       <p style="font-size: 12px; margin-top: 0%;"><i>Options are saved when you start the server</i></p>
 
 
@@ -121,6 +123,8 @@
         <button onclick="saveServerProperties();">save changes</button>
         <button onclick="resetChanges();">reset changes</button>
         </div>
+
+        <input type="search" name="" id="properties_search" placeholder="Search" oninput="propertiesSearch(this.value)" style="width: 405px;">
 
         <table id="server_properties" style="text-align: left; border-collapse:separate;">
         </table>

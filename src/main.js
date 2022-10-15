@@ -12,12 +12,14 @@ var temp_settings_data = {};
 
 var disable_switch = false;
 
+var player_data = {};
 
 //startup
 loadIntoBar();
 
 //load config
 var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+loadTheme(config["theme"],s=true)
 document.getElementById("path_input").value = config.search_path;
 const java_folder = config.java_folder_path
 
@@ -46,15 +48,31 @@ alterCSS();
 
 function alterCSS() {
 
-    var r = document.querySelector(':root');
+    b = document.getElementById("start_server_button");
     if (config["accentStartButton"]) {
-        r.style.setProperty('--celadon-green', '#36827f');
-        r.style.setProperty('--verdigris', '#52b7b3')
+        b.style.backgroundColor = "var(--accent)"
+        b.style.borderColor = "var(--accent-highlight)";
     } else {
-        r.style.setProperty('--celadon-green', '#4a306dff');
-        r.style.setProperty('--verdigris', '#a167a5ff')
+        b.style.backgroundColor = "var(--color-3)";
+        b.style.borderColor = "var(--color-2)";
     }
 
+}
+
+function loadTheme(theme, s=false) {
+    if (!s) {
+        config["theme"] = theme;
+        saveConfig();
+    }
+    theme = config["themes"][theme]
+    var r = document.querySelector(':root');
+
+    for (const key in theme) {
+        if (Object.hasOwnProperty.call(theme, key)) {
+            const hex = theme[key];
+            r.style.setProperty('--'+key, hex);
+        }
+    }
 }
 
 buildSettings()
@@ -69,7 +87,7 @@ function buildSettings() {
     var table = document.getElementById("settings_table");
     config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
-    let ignore = ["search_path","java_folder_path"]
+    let ignore = ["search_path","java_folder_path","themes","theme"]
 
     for (var key in config) {
 
@@ -99,6 +117,8 @@ function buildSettings() {
             updateSettings(this.id, this.checked);
         }
 
+
+
         th_setting.appendChild(setting);
         tr.appendChild(th_setting);
         
@@ -107,12 +127,24 @@ function buildSettings() {
 
     }
 
+    theme_select = document.getElementById("theme_select")
+    
+    for (var theme in config["themes"]) {
+        o = document.createElement("option");
+        o.innerHTML = theme;
+        theme_select.append(o);
+    }
+
+    theme_select.value = config["theme"]
 
 }
 
 function updateSettings(key, property) {
     config[key] = property;
     saveConfig();
+    if (key == "side-menu-server-icons") {
+        loadIntoBar();
+    }
 }
 
 
@@ -216,6 +248,7 @@ function listFiles() {
 function loadIntoBar() {
     //load server_list.json into the scrollbar
     var ul = document.getElementById("serverlist");
+    var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
     //remove all children, except the first one
     for (var i = ul.children.length - 1; i > 0; i--) {
@@ -232,18 +265,43 @@ function loadIntoBar() {
     for (var key in data) {
 
         var li = document.createElement("li");
-        var button = document.createElement("button");
+
+        if (config["side-menu-server-icons"]) {
+            var button = document.createElement("img");
+            if (fs.existsSync(data[key].path + '\\server-icon.png')) {
+                button.src = data[key].path + '\\server-icon.png?t=' + new Date().getTime();
+            } else {
+                button.src = 'https://via.placeholder.com/64';
+            }
+        } else {
+            var button = document.createElement("button");
+            button.innerHTML = data[key].name;
+        }
+
 
         button.setAttribute("id", data[key].id);
         button.setAttribute("onclick", "loadServer(this.id)");
         
         button.classList.add("server_list");
 
-        button.innerHTML = data[key].name;
+
 
         li.appendChild(button);
         ul.appendChild(li);
 
+    }
+
+
+    if (config["side-menu-server-icons"]) {
+        document.getElementById("scrollmenu").style.width = "64px";
+        document.getElementById("show-settings-button").style.width = "64px";
+        document.getElementById("settings_screen").style.width = "90%";
+        document.getElementById("server_screen").style.width = "90%";
+    } else {
+        document.getElementById("scrollmenu").style.width = "18%";
+        document.getElementById("show-settings-button").style.width = "100%";
+        document.getElementById("settings_screen").style.width = "80%";
+        document.getElementById("server_screen").style.width = "80%";
     }
 
 }
@@ -260,9 +318,9 @@ function loadServer(server_id) {
     }
 
     if (config["instantlySaveServerProperties"]) {
-        showDiv("save_properties_button")
-    } else {
         hideDiv("save_properties_button")
+    } else {
+        showDiv("save_properties_button")
     }
 
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
@@ -482,7 +540,6 @@ function loadServer(server_id) {
     var playerdata_files = 0;
     var player_uuid = [];
 
-    console.log(data.properties)
 
     fs.readdirSync(data.path + '\\' + data.properties['level-name'] + '\\playerdata').forEach(element => {
         if (element.endsWith('.dat')) {
@@ -498,6 +555,8 @@ function loadServer(server_id) {
 
 
     //properties
+    document.getElementById("properties_search").value = "";
+    propertiesSearch("");
     var table = document.getElementById("server_properties");
 
     var dropdown_properties = {
@@ -575,6 +634,8 @@ function loadServer(server_id) {
     hideDiv('settings_screen');
     showDiv('server_screen');
 
+    
+
 
 }
 
@@ -590,6 +651,7 @@ function hideDiv(div_id) {
 
 function toggleDiv(div_id) {
     var x = document.getElementById(div_id);
+    
     if (x.style.display == "none") {
         x.style.display = "block";
     } else {
@@ -888,6 +950,7 @@ function backupWorld() {
 }
 
 
+
 function loadPlayerData(uuid) {
 
     var table = document.getElementById("player_list");
@@ -896,7 +959,7 @@ function loadPlayerData(uuid) {
         table.removeChild(table.children[i]);
     }
 
-    var player_data = {};
+    player_data = {};
 
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
     var server_path = data[active_server_id].path;
@@ -989,6 +1052,7 @@ function loadPlayerData(uuid) {
 
     for(player in player_data) {
 
+        uuid = player
         player = player_data[player]
 
         tr = document.createElement("tr");
@@ -1013,36 +1077,135 @@ function loadPlayerData(uuid) {
         tr.append(th_img);
         tr.append(th_name);
 
-        a = ["op","whitelisted","banned"];
+        //add op level
+        select = document.createElement("select");
+        info = ["Player is not op.","Player can bypass spawn protection.","Player can use cheat commands and command blocks.","Player can use multiplayer management commands.","Player can use all commands including server management commands"]
+        
+        for(i = 0; i <= 4; i++) {
+            option = document.createElement("option");
+            option.value = i;
+            option.innerHTML = i;
+            option.title = info[i];
+            select.append(option);
 
-        for(i = 0; i < 3; i++) {
+        }
+
+        select.value = player["op"];
+        select.id = uuid
+        select.setAttribute("onchange", 'updatePlayerData(this.id,"op",parseInt(this.value))');
+
+
+        tr.append(select);
+
+        table.append(tr);
+
+        a = ["whitelisted","banned"];
+
+        for(i = 0; i < 2; i++) {
             th_check = document.createElement("th");
             input = document.createElement("input");
 
             input.type = "checkbox";
             input.checked = player[a[i]];
+            input.id = uuid+"//"+a[i];
+
+            input.setAttribute("onchange", 'updatePlayerData(this.id.split("//")[0],this.id.split("//")[1], this.checked)');
+
 
             th_check.append(input);
             tr.append(th_check);
         }
 
-        //add op level option if player is op
-        if (player["op"] > 0) {
-            select = document.createElement("select");
-            
-            for(i = 1; i <= 4; i++) {
-                option = document.createElement("option");
-                option.value = i;
-                option.innerHTML = i;
-                select.append(option);
-            }
-
-            select.value = player["op"];
-
-            tr.append(select);
-        }
-
-        table.append(tr);
 
     }
+
+}
+
+function getDateTime() {
+    var date_ob = new Date();
+    var day = ("0" + date_ob.getDate()).slice(-2);
+    var month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+    var year = date_ob.getFullYear();
+        
+    var hours = date_ob.getHours();
+    var minutes = date_ob.getMinutes();
+    var seconds = date_ob.getSeconds();
+    
+    var dateTime = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
+    return dateTime;
+}
+
+function updatePlayerData(uuid, key, value) {
+    //update local player data properties
+    player_data[uuid][key] = value;
+    SavePlayerData();
+}
+
+function propertiesSearch(search) {
+    //hide elements that do not contain search
+    children = document.getElementById("server_properties").children;
+
+    for (let index = 0; index < children.length; index++) {
+        const element = children[index];
+        const text = element.firstChild.firstChild.innerHTML;
+        
+        if (text.search(search) == -1) {
+            element.style.display = "none";
+        } else {
+            element.style.display = "";
+        }
+        
+    }
+}
+
+function SavePlayerData() {
+    ops = []
+    whitelist = []
+    banned = []
+
+    for (const key in player_data) {
+        if (Object.hasOwnProperty.call(player_data, key)) {
+            const player = player_data[key];
+            if (player["op"] > 0) {
+                ops.push({
+                    "uuid": key,
+                    "name": player["name"],
+                    "level": player["op"],
+                    "bypassesPlayerLimit": false
+                })
+            }
+
+            if (player["banned"] == true) {
+                banned.push({
+                    "uuid": key,
+                    "name": player["name"],
+                    "created": getDateTime(),
+                    "source": "mc-server-management",
+                    "expires": "forever",
+                    "reason": "Banned by an operator."
+                })
+            }
+
+            if (player["whitelisted"] == true) {
+                whitelist.push({
+                    "uuid": key,
+                    "name": player["name"]
+                })
+            }
+        }
+    }
+
+    //write
+
+    var server_path = JSON.parse(fs.readFileSync('server_list.json', 'utf8'))[active_server_id].path;
+
+    fs.writeFileSync(server_path+"/ops.json", JSON.stringify(ops, null, 4));
+    fs.writeFileSync(server_path+"/banned-players.json", JSON.stringify(banned, null, 4));
+    fs.writeFileSync(server_path+"/whitelist.json", JSON.stringify(whitelist, null, 4));
+
+
+
+
+    console.log(ops)
+
 }

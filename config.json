@@ -6,7 +6,7 @@
     "closeConsoleOnServerStop": false,
     "accentStartButton": true,
     "instantlySaveServerProperties": true,
-    "theme": "Cobalt",
+    "theme": "Purple",
     "themes": {
         "Purple": {
             "color-1": "#e8d7f1ff",
@@ -52,6 +52,15 @@
             "background-2": "#330000",
             "accent": "#770000",
             "accent-highlight": "#c30000"
+        },
+        "Night": {
+            "color-1": "#001122",
+            "color-2": "#273038",
+            "color-3": "#000C1D",
+            "background": "#000C1D",
+            "background-2": "#001122",
+            "accent": "#8B8C89",
+            "accent-highlight": "#E7ECEF"
         }
     }
 }

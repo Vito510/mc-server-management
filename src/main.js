@@ -117,6 +117,8 @@ function buildSettings() {
             updateSettings(this.id, this.checked);
         }
 
+
+
         th_setting.appendChild(setting);
         tr.appendChild(th_setting);
         
@@ -140,6 +142,9 @@ function buildSettings() {
 function updateSettings(key, property) {
     config[key] = property;
     saveConfig();
+    if (key == "side-menu-server-icons") {
+        loadIntoBar();
+    }
 }
 
 
@@ -243,6 +248,7 @@ function listFiles() {
 function loadIntoBar() {
     //load server_list.json into the scrollbar
     var ul = document.getElementById("serverlist");
+    var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
     //remove all children, except the first one
     for (var i = ul.children.length - 1; i > 0; i--) {
@@ -259,18 +265,43 @@ function loadIntoBar() {
     for (var key in data) {
 
         var li = document.createElement("li");
-        var button = document.createElement("button");
+
+        if (config["side-menu-server-icons"]) {
+            var button = document.createElement("img");
+            if (fs.existsSync(data[key].path + '\\server-icon.png')) {
+                button.src = data[key].path + '\\server-icon.png?t=' + new Date().getTime();
+            } else {
+                button.src = 'https://via.placeholder.com/64';
+            }
+        } else {
+            var button = document.createElement("button");
+            button.innerHTML = data[key].name;
+        }
+
 
         button.setAttribute("id", data[key].id);
         button.setAttribute("onclick", "loadServer(this.id)");
         
         button.classList.add("server_list");
 
-        button.innerHTML = data[key].name;
+
 
         li.appendChild(button);
         ul.appendChild(li);
 
+    }
+
+
+    if (config["side-menu-server-icons"]) {
+        document.getElementById("scrollmenu").style.width = "64px";
+        document.getElementById("show-settings-button").style.width = "64px";
+        document.getElementById("settings_screen").style.width = "90%";
+        document.getElementById("server_screen").style.width = "90%";
+    } else {
+        document.getElementById("scrollmenu").style.width = "18%";
+        document.getElementById("show-settings-button").style.width = "100%";
+        document.getElementById("settings_screen").style.width = "80%";
+        document.getElementById("server_screen").style.width = "80%";
     }
 
 }

@@ -14,13 +14,12 @@ var disable_switch = false;
 
 var player_data = {};
 
-
-
 //startup
 loadIntoBar();
 
 //load config
 var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+loadTheme(config["theme"],s=true)
 document.getElementById("path_input").value = config.search_path;
 const java_folder = config.java_folder_path
 
@@ -49,15 +48,31 @@ alterCSS();
 
 function alterCSS() {
 
-    var r = document.querySelector(':root');
+    b = document.getElementById("start_server_button");
     if (config["accentStartButton"]) {
-        r.style.setProperty('--celadon-green', '#36827f');
-        r.style.setProperty('--verdigris', '#52b7b3')
+        b.style.backgroundColor = "var(--accent)"
+        b.style.borderColor = "var(--accent-highlight)";
     } else {
-        r.style.setProperty('--celadon-green', '#4a306dff');
-        r.style.setProperty('--verdigris', '#a167a5ff')
+        b.style.backgroundColor = "var(--color-3)";
+        b.style.borderColor = "var(--color-2)";
     }
 
+}
+
+function loadTheme(theme, s=false) {
+    if (!s) {
+        config["theme"] = theme;
+        saveConfig();
+    }
+    theme = config["themes"][theme]
+    var r = document.querySelector(':root');
+
+    for (const key in theme) {
+        if (Object.hasOwnProperty.call(theme, key)) {
+            const hex = theme[key];
+            r.style.setProperty('--'+key, hex);
+        }
+    }
 }
 
 buildSettings()
@@ -72,7 +87,7 @@ function buildSettings() {
     var table = document.getElementById("settings_table");
     config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
-    let ignore = ["search_path","java_folder_path"]
+    let ignore = ["search_path","java_folder_path","themes","theme"]
 
     for (var key in config) {
 
@@ -110,6 +125,15 @@ function buildSettings() {
 
     }
 
+    theme_select = document.getElementById("theme_select")
+    
+    for (var theme in config["themes"]) {
+        o = document.createElement("option");
+        o.innerHTML = theme;
+        theme_select.append(o);
+    }
+
+    theme_select.value = config["theme"]
 
 }
 

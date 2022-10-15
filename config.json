@@ -5,5 +5,53 @@
     "closeOnServerStart": false,
     "closeConsoleOnServerStop": false,
     "accentStartButton": true,
-    "instantlySaveServerProperties": true
+    "instantlySaveServerProperties": true,
+    "theme": "Cobalt",
+    "themes": {
+        "Purple": {
+            "color-1": "#e8d7f1ff",
+            "color-2": "#a167a5ff",
+            "color-3": "#4a306dff",
+            "background": "#0e273cff",
+            "background-2": "#0b1f30",
+            "accent": "#36827f",
+            "accent-highlight": "#52b7b3"
+        },
+        "Cold": {
+            "color-1": "#102a44",
+            "color-2": "#06488a",
+            "color-3": "#43a6e0",
+            "background": "#000C1D",
+            "background-2": "#001122",
+            "accent": "#bfc219",
+            "accent-highlight": "#f7fa3c"
+        },
+        "Cold2": {
+            "color-1": "#A3CEF1",
+            "color-2": "#6096BA",
+            "color-3": "#274C77",
+            "background": "#000C1D",
+            "background-2": "#001122",
+            "accent": "#8B8C89",
+            "accent-highlight": "#E7ECEF"
+        },
+        "Cobalt": {
+            "color-1": "#ffc600",
+            "color-2": "#ff9d00",
+            "color-3": "#cfa40e",
+            "background": " #193549",
+            "background-2": "#122738",
+            "accent": "#ff628c",
+            "accent-highlight": "#ff0088"
+        },
+        "Red": {
+            "color-1": "#ffc600",
+            "color-2": "#ff9d00",
+            "color-3": "#cfa40e",
+            "background": " #390000",
+            "background-2": "#330000",
+            "accent": "#770000",
+            "accent-highlight": "#c30000"
+        }
+    }
 }

@@ -34,6 +34,8 @@
       <table id="settings_table" style="text-align: left; border-collapse:separate;">
       </table>
 
+      <select name="theme_select" id="theme_select" onchange="loadTheme(this.value)"></select>
+
       <hr>
 
       <p style="margin-bottom: 0%;">Open vanilla server jar download page</p>
@@ -91,7 +93,7 @@
       <br>
 
 
-      <button class="start_server_button" onclick="startServer();">start server</button>
+      <button id="start_server_button" class="start_server_button" onclick="startServer();">start server</button>
       <p style="font-size: 12px; margin-top: 0%;"><i>Options are saved when you start the server</i></p>
 
 

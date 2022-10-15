@@ -707,6 +707,10 @@ function changeServerIcon(id) {
     data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
 
     document.getElementById("server_icon").src = path;
+    document.getElementById(active_server_id).style.width = '64px';
+    document.getElementById(active_server_id).style.height = '64px';
+    document.getElementById(active_server_id).src = path;
+
 
 }
 

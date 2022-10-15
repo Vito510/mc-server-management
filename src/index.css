@@ -28,6 +28,10 @@ button.server_list {
   width: 100%;
 }
 
+img.server_list {
+  border-radius: 0%;
+}
+
 img.server_images {
   width: 30%;
   padding-right: 2%;

@@ -6,6 +6,7 @@
     "closeConsoleOnServerStop": false,
     "accentStartButton": true,
     "instantlySaveServerProperties": true,
+    "side-menu-server-icons": true,
     "theme": "Purple",
     "themes": {
         "Purple": {

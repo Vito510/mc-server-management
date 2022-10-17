@@ -730,7 +730,7 @@ function showSettings() {
 function updateProperty(property, value) {
     //update property in server_list.json
     temp_settings_data[active_server_id]['properties'][property] = value;
-    if (config["instantlySaveServerProperties"] == false) {
+    if (config["instantlySaveServerProperties"] == true) {
         saveServerProperties();
     }
 

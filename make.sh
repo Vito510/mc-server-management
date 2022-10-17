@@ -7,3 +7,5 @@ del=(".gitignore" "cache.json" "config.json" "make.sh" "server_list.json" "TODO.
 for i in ${del[@]}; do
     rm -r $app/$i
 done
+
+cp ./config.json $path

@@ -1,6 +1,7 @@
 const { table } = require('console');
 const fs = require('fs');
 const os = require('os');
+const { windowsStore } = require('process');
 
 
 var system_memory = os.totalmem() / 1024 / 1024;
@@ -633,6 +634,10 @@ function loadServer(server_id) {
 
     hideDiv('settings_screen');
     showDiv('server_screen');
+
+    x = document.getElementById('server_screen');
+    x.scrollTop = 0;
+
 
     
 

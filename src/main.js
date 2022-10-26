@@ -666,8 +666,30 @@ function openDownloadPage(s, id) {
     }
 
     var child_process = require('child_process');
-    base_url = "https://mcversions.net/download/"
-    child_process.exec("start "+base_url+s)
+
+    const t = document.getElementById("sevrer_type_search").value
+    
+    switch (t) {
+        case 'vanilla':
+            url = "https://mcversions.net/download/"+s
+            break;
+        case 'forge':
+            url = "https://files.minecraftforge.net/net/minecraftforge/forge/index_"+s+".html"
+            break;
+        case 'paper':
+            url = "https://papermc.io/downloads"
+            break;
+        case 'spigot':
+            url = "https://getbukkit.org/download/spigot"
+            break;
+        case 'craftbukkit':
+            url = "https://getbukkit.org/download/craftbukkit"
+            break;
+        default:
+            break;
+    }
+
+    child_process.exec("start "+url)
 
     x = document.getElementById(id);
     x.value = "";

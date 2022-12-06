@@ -1,3 +1,5 @@
+const { path } = require('animejs');
+const { exec } = require('child_process');
 const { table } = require('console');
 const fs = require('fs');
 const os = require('os');
@@ -701,35 +703,23 @@ function openDownloadPage(s, id) {
 }
 
 function changeServerIcon(id) {
-    path = document.getElementById(id).files[0].path;
+    var path = document.getElementById(id).files[0].path;
 
     path = path.split("\\");
 
-    for (let i = 0; i < path.length; i++) {
-        if (path[i].indexOf(" ") != -1) {
-            path[i] = '"'+path[i]+'"';
-        } 
-    }
-
     path = path.join("/");
+    path = encodeURI(path)
+    console.log(path);
 
-    var ffmpeg = require('ffmpeg');
     var data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
 
     out = data[active_server_id].path
     out = out.replace("/","\\")
 
 
-    var process = new ffmpeg(path);
 
-    process.then(function (image) {
+    exec('ffmpeg -i "'+path+'" -vf scale=64:64 -y "'+out+'\\server-icon.png"')
 
-
-        // image.setVideoSize("64x64");
-        image.addCommand("-vf scale=64:64")
-        image.addCommand("-y")
-        image.save('"'+out+'\\server-icon.png"')
-    });
 
     data = JSON.parse(fs.readFileSync('server_list.json', 'utf8'));
 
